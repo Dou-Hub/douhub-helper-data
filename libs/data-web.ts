@@ -3,11 +3,11 @@
 //  This source code is licensed under the MIT license.
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
-import cheerio, {CheerioAPI} from 'cheerio';
+import cheerio from 'cheerio';
 import { isNumber, isNil } from 'lodash';
 import { isNonEmptyString, isObject } from 'douhub-helper-util';
 
-export const removeEmpty = (html: CheerioAPI) => {
+export const removeEmpty = (html) => {
     const emptyElementSelector = "head:empty,p:empty,span:empty,h1:empty,a:empty,h2:empty,h3:empty,h4:empty,h5:empty,h6:empty,li:empty,ol:empty,ul:empty,code:empty,i:empty,div:empty,blockquote:empty,ins:empty";
     let emptyElements = html(emptyElementSelector);
     while (emptyElements.length > 0) {
@@ -59,7 +59,7 @@ export const cleanHTML = (content: string, settings?: Record<string, any>) => {
     const host = settings.host;
     const returnContent = settings.returnContent;
 
-    let html:CheerioAPI = cheerio.load(content
+    let html = cheerio.load(content
         .replace(/&nbsp;/g, " ")
         .replace(/\r/g, " ")
         .replace(/\n/g, " ")
@@ -110,7 +110,7 @@ export const cleanHTML = (content: string, settings?: Record<string, any>) => {
     }
 };
 
-const removeSingleParent = (html: CheerioAPI, parentElem?:Record<string,any>): any => {
+const removeSingleParent = (html: any, parentElem?:Record<string,any>): any => {
 
    
     if (!parentElem) {
@@ -126,9 +126,9 @@ const removeSingleParent = (html: CheerioAPI, parentElem?:Record<string,any>): a
             parentElem.html(childElem.html());
         }
     }
-    parentElem?.children()?.each( //Changed this!
-        (o:any)=> {
-            html(o).html(removeSingleParent(html, html(o)).html());
+    parentElem?.children()?.each(
+        function () {
+            html(this).html(removeSingleParent(html, html(this)).html());
         });
     return parentElem;
 };
@@ -136,9 +136,8 @@ const removeSingleParent = (html: CheerioAPI, parentElem?:Record<string,any>): a
 export const removeComments = (html: any): any => {
     html.root()
         .contents()
-        .filter((o:any) => ////Changed this!
-        { 
-            return o.type === "comment";
+        .filter(function () {
+            return this.type === "comment";
         })
         .remove();
 
@@ -154,18 +153,18 @@ export const fixImages = (html: any, settings: Record<string,any>): any => {
         html("img").remove();
     }
     else {
-        html("img").each((o:any)=> { //Changed this!
-            if (isNonEmptyString(o.attribs.src)) {
-                const src = html(o).attr("src");
+        html("img").each(function () {
+            if (isNonEmptyString(this.attribs.src)) {
+                const src = html(this).attr("src");
                 if (src.indexOf('//') == 0) {
-                    html(o).attr("src", `${protocol}${src}`);
+                    html(this).attr("src", `${protocol}${src}`);
                 }
                 if (src.indexOf('/') == 0) {
-                    html(o).attr("src", `${protocol}//${host}${src}`);
+                    html(this).attr("src", `${protocol}//${host}${src}`);
                 }
             }
             else {
-                html(o).remove();
+                html(this).remove();
             }
         });
     }
@@ -173,45 +172,45 @@ export const fixImages = (html: any, settings: Record<string,any>): any => {
     return html;
 };
 
-export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) => {
+export const cleanElements = (html, settings: Record<string,any>) => {
     const { fromEditor, protocol, host, keepForm, removeShortP, removeShortDiv } = settings;
     let removed = false;
-    html("*").each((o:any)=> { //Changed this!
-        html(o)
+    html("*").each(function () {
+        html(this)
             .contents()
             .filter(function () {
-                return o.type === "comment";
+                return this.type === "comment";
             })
             .remove();
 
-        const tagName = html(o).get(0).tagName.toLowerCase();
+        const tagName = html(this).get(0).tagName.toLowerCase();
         switch (tagName) {
             case "form": {
                 if (!keepForm) {
-                    html(o).remove();
+                    html(this).remove();
                     removed = true;
                 }
                 break;
             }
             case "script": {
-                html(o).remove();
+                html(this).remove();
                 removed = true;
                 break;
             }
             case "img": {
 
-                if (!isNonEmptyString(o.attribs.src)) {
-                    html(o).remove();
+                if (!isNonEmptyString(this.attribs.src)) {
+                    html(this).remove();
                     removed = true;
                 }
                 else {
                     //image must have alt
-                    if (!isNonEmptyString(o.attribs.alt)) {
-                        o.attribs.alt = o.attribs.src;
+                    if (!isNonEmptyString(this.attribs.alt)) {
+                        this.attribs.alt = this.attribs.src;
                     }
 
                     //image elements paraent has to be div or body
-                    let parent = html(o).parent();
+                    let parent = html(this).parent();
                     while (parent && parent.get(0) && (parent.get(0).tagName != 'div' && parent.get(0).tagName != 'body')) {
                         parent.get(0).tagName = 'div';
                         parent = parent.parent();
@@ -221,37 +220,37 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
             }
             case "a":
                 {
-                    if (!isNonEmptyString(o.attribs.href)) {
-                        html(o).remove();
+                    if (!isNonEmptyString(this.attribs.href)) {
+                        html(this).remove();
                         removed = true;
                     }
                     else {
-                        const href = html(o).attr("href");
-                        if (href?.indexOf('//') == 0) {
-                            html(o).attr("href", `${protocol}${href}`);
+                        const href = html(this).attr("href");
+                        if (href.indexOf('//') == 0) {
+                            html(this).attr("href", `${protocol}${href}`);
                         }
-                        if (href?.indexOf('/') == 0) {
-                            html(o).attr("href", `${protocol}//${host}${href}`);
+                        if (href.indexOf('/') == 0) {
+                            html(this).attr("href", `${protocol}//${host}${href}`);
                         }
                     }
 
-                    if (html(o).children().length == 0 && html(o).text().length == 0) {
-                        html(o).remove();
+                    if (html(this).children().length == 0 && html(this).text().length == 0) {
+                        html(this).remove();
                         removed = true;
                     }
 
                     if (!removed) {
 
-                        o.attribs.target = "_blank";
+                        this.attribs.target = "_blank";
 
-                        if (fromEditor && html(o).children().length == 1 && html(o).children()[0].name == 'img') {
-                            html(o).get(0).tagName = 'img';
-                            o.attribs.src = html(o).children()[0].attribs.src;
-                            html(o).html('');
+                        if (fromEditor && html(this).children().length == 1 && html(this).children()[0].name == 'img') {
+                            html(this).get(0).tagName = 'img';
+                            this.attribs.src = html(this).children()[0].attribs.src;
+                            html(this).html('');
                         }
                         else {
                             //a can only be the parent of text
-                            html(o).html(html(o).text());
+                            html(this).html(html(this).text());
                         }
                     }
 
@@ -259,22 +258,22 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
                 }
             case "video":
                 {
-                    if (!isNonEmptyString(o.attribs.src)) {
-                        html(o).remove();
+                    if (!isNonEmptyString(this.attribs.src)) {
+                        html(this).remove();
                         removed = true;
                     }
                     else {
                         if (!fromEditor) {
-                            html(o).get(0).tagName = 'div';
-                            o.attribs.class = "form-field-html-video-container";
-                            html(o).html(`<iframe class="form-field-html-video" src="${o.attribs.src}"/>`);
+                            html(this).get(0).tagName = 'div';
+                            this.attribs.class = "form-field-html-video-container";
+                            html(this).html(`<iframe class="form-field-html-video" src="${this.attribs.src}"/>`);
                         }
                     }
                     break;
                 }
             case "iframe": {
-                if (!isNonEmptyString(o.attribs.src)) {
-                    html(o).remove();
+                if (!isNonEmptyString(this.attribs.src)) {
+                    html(this).remove();
                     removed = true;
                 }
                 break;
@@ -283,9 +282,9 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
             case "em":
             case "u":
                 {
-                    html(o).get(0).tagName = "span";
-                    if (html(o).text().trim().length == 0 && html(o).children().length == 0) {
-                        html(o).remove();
+                    html(this).get(0).tagName = "span";
+                    if (html(this).text().trim().length == 0 && html(this).children().length == 0) {
+                        html(this).remove();
                         removed = true;
                     }
                     break;
@@ -297,14 +296,14 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
             case "sup":
             case "sub":
                 {
-                    if (html(o).text().length == 0 && html(o).children().length == 0) {
-                        html(o).remove();
+                    if (html(this).text().length == 0 && html(this).children().length == 0) {
+                        html(this).remove();
                         removed = true;
                     }
                     else {
                         //these element does not allow to have sub element in html editor, we will change them to span
-                        if (html(o).children().length > 0) {
-                            html(o).get(0).tagName = "span";
+                        if (html(this).children().length > 0) {
+                            html(this).get(0).tagName = "span";
                         }
                     }
                     break;
@@ -324,20 +323,20 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
             case "ol":
             case "li":
                 {
-                    if (html(o).text().trim().length == 0 && html(o).children().length == 0) {
-                        html(o).remove();
+                    if (html(this).text().trim().length == 0 && html(this).children().length == 0) {
+                        html(this).remove();
                         removed = true;
                     }
                     else {
                         if (tagName == 'h5' || tagName == 'h6') {
-                            html(o).get(0).tagName = "p";
+                            html(this).get(0).tagName = "p";
                         }
                     }
                     break;
                 }
             case "hr":
                 {
-                    html(o).remove();
+                    html(this).remove();
                     removed = true;
                     break;
                 }
@@ -352,16 +351,16 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
                 }
             case "p":
                 {
-                    if (html(o).text().trim().length == 0 && html(o).children().length == 0 || removeShortP && html(o).text().trim().length < removeShortP) {
-                        html(o).remove();
+                    if (html(this).text().trim().length == 0 && html(this).children().length == 0 || removeShortP && html(this).text().trim().length < removeShortP) {
+                        html(this).remove();
                         removed = true;
                     }
                     break;
                 }
             case "div":
                 {
-                    if (html(o).text().trim().length == 0 && html(o).children().length == 0 || removeShortDiv && html(o).text().trim().length < removeShortDiv) {
-                        html(o).remove();
+                    if (html(this).text().trim().length == 0 && html(this).children().length == 0 || removeShortDiv && html(this).text().trim().length < removeShortDiv) {
+                        html(this).remove();
                         removed = true;
                     }
                     //do nothing
@@ -370,13 +369,13 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
             case "section":
             case "article":
                 {
-                    html(o).get(0).tagName = "div";
+                    html(this).get(0).tagName = "div";
                     break;
                 }
             default: {
-                html(o).get(0).tagName = "p";
-                if (html(o).text().length == 0 && html(o).children().length == 0) {
-                    html(o).remove();
+                html(this).get(0).tagName = "p";
+                if (html(this).text().length == 0 && html(this).children().length == 0) {
+                    html(this).remove();
                     removed = true;
                 }
                 break;
@@ -389,7 +388,7 @@ export const cleanElements = (html: CheerioAPI, settings: Record<string,any>) =>
     return html;
 };
 
-export const removeAllAttributes = (html: CheerioAPI, exceptTags:string, exceptAttrs:string) => {
+export const removeAllAttributes = (html, exceptTags:string, exceptAttrs:string) => {
  
     exceptTags = isNonEmptyString(exceptTags)
         ? `,${exceptTags},`.toLowerCase()
@@ -398,21 +397,21 @@ export const removeAllAttributes = (html: CheerioAPI, exceptTags:string, exceptA
         ? `,${exceptAttrs},`.toLowerCase()
         : '';
 
-        html("*").each( (o:any) =>{ //Changed this! 
+        html("*").each(function () {
         // iterate over all elements
 
-        const tagName = html(o).get(0).tagName;
+        const tagName = html(this).get(0).tagName;
         if (exceptTags.indexOf(`,${tagName.toLowerCase()},`) < 0) {
-            o.attribs = {}; // remove all attributes
+            this.attribs = {}; // remove all attributes
         } else {
             if (exceptAttrs.indexOf(`,${tagName}.`) >= 0) {
-                const newAttribs: Record<string,any> = {};
-                for (let key in o.attribs) {
+                const newAttribs = {};
+                for (let key in this.attribs) {
                     if (exceptAttrs.indexOf(`,${tagName}.${key},`) >= 0) {
-                        newAttribs[key] = o.attribs[key];
+                        newAttribs[key] = this.attribs[key];
                     }
                 }
-                o.attribs = newAttribs;
+                this.attribs = newAttribs;
             }
         }
     });

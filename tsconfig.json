@@ -4,7 +4,12 @@
     "module": "commonjs",
     "declaration": true,
     "outDir": "build",
-    "strict": true
+    "preserveConstEnums": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "lib": ["es2015"]
   },
   "exclude": ["node_modules", "**/__tests__/*"]
 }

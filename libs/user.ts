@@ -37,7 +37,7 @@ Get the user organizations based on mobile number or email
 Return all organizations user belong to. 
 If there are more than one organizations for a user, the UI should ask user to choose one
 */
-export const userOrgs = async (email?: string, mobile?: string, verificationCode?: string): Promise<Record<string, any>> => {
+export const getUserOrgs = async (email?: string, mobile?: string, verificationCode?: string): Promise<Record<string, any>> => {
 
     const source = 'createUser';
 
@@ -68,7 +68,7 @@ export const userOrgs = async (email?: string, mobile?: string, verificationCode
 
     if (isNonEmptyString(verificationCode)) {
         //We will need to verify the code first 
-        if (!(await verifyCode(email, mobile, verificationCode))) {
+        if (!(await verifyUserCode(email, mobile, verificationCode))) {
             return onError({
                 ...HTTPERROR_400,
                 source,
@@ -99,7 +99,7 @@ export const userOrgs = async (email?: string, mobile?: string, verificationCode
 };
 
 
-export const verifyCode = async (email?: string, mobile?: string, verificationCode?: string): Promise<boolean> => {
+export const verifyUserCode = async (email?: string, mobile?: string, verificationCode?: string): Promise<boolean> => {
 
     const users = await cosmosDBQuery(`SELECT * FROM c 
         WHERE c.email=@email AND c.emailVerificationCode=@verificationCode 
@@ -219,7 +219,7 @@ export const createUser = async (context: Record<string,any>, user: Record<strin
     try {
 
         if (_track) console.log('Check existing users.', {user});
-        const existingUsers = await userOrgs(user.email, user.mobile);
+        const existingUsers = await getUserOrgs(user.email, user.mobile);
 
         if (!isNil(organizationId) && find(existingUsers, (u) => u.organizationId == organizationId)) 
         {

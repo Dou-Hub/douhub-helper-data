@@ -625,7 +625,7 @@
 
 "@types/aws-lambda@^8.10.85":
   version "8.10.89"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.89.tgz#22617ecc1eef9571abebb50c947553362da6051b"
+  resolved "https://registry.npmjs.org/@types/aws-lambda/-/aws-lambda-8.10.89.tgz"
   integrity sha512-jwtSuEZj4rY4R2pAEOXi+RutS8RWbwMzoGlRVukdyOpnfqA/XPkAf8QoGWmg4o/UaNpQ8Mj0Xhkp5SZ1t/Zq4Q==
 
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14":
@@ -703,9 +703,14 @@
   integrity sha512-0fDwydE2clKe9MNfvXHBHF9WEahRuj+msTuQqOmAApNORFvhMYZKNGGJdCzuhheVjMps/ti0Ak/iJPACMaevvw==
 
 "@types/node@*":
-  version "16.11.9"
-  resolved "https://registry.npmjs.org/@types/node/-/node-16.11.9.tgz"
-  integrity sha512-MKmdASMf3LtPzwLyRrFjtFFZ48cMf8jmX5VRYrDQiJa8Ybu5VAmkqBWqKU8fdCwD8ysw4mQ9nrEHvzg6gunR7A==
+  version "17.0.6"
+  resolved "https://registry.npmjs.org/@types/node/-/node-17.0.6.tgz"
+  integrity sha512-+XBAjfZmmivILUzO0HwBJoYkAyyySSLg5KCGBDFLomJo0sV6szvVLAf4ANZZ0pfWzgEds5KmGLG9D5hfEqOhaA==
+
+"@types/node@^16.11.6":
+  version "16.11.17"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.17.tgz#ae146499772e33fc6382e1880bc567e41a528586"
+  integrity sha512-C1vTZME8cFo8uxY2ui41xcynEotVkczIVI5AjLmy5pkpBv/FtG+jhtOlfcPysI8VRVwoOMv6NJm44LGnoMSWkw==
 
 "@types/prettier@^2.1.5":
   version "2.4.2"
@@ -942,7 +947,7 @@ asynckit@^0.4.0:
 
 aws-lambda@^1.0.7:
   version "1.0.7"
-  resolved "https://registry.yarnpkg.com/aws-lambda/-/aws-lambda-1.0.7.tgz#c6b674df47458b5ecd43ab734899ad2e2d457013"
+  resolved "https://registry.npmjs.org/aws-lambda/-/aws-lambda-1.0.7.tgz"
   integrity sha512-9GNFMRrEMG5y3Jvv+V4azWvc+qNWdWLTjDdhf/zgMlz8haaaLWv0xeAIWxz9PuWUBawsVxy0zZotjCdR3Xq+2w==
   dependencies:
     aws-sdk "^2.814.0"
@@ -967,7 +972,7 @@ aws-sdk@^2.1033.0:
 
 aws-sdk@^2.814.0:
   version "2.1048.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1048.0.tgz#02f2f35e0f51dd4510462e05c7a48fd4649d33f8"
+  resolved "https://registry.npmjs.org/aws-sdk/-/aws-sdk-2.1048.0.tgz"
   integrity sha512-mVwWo+Udiuc/yEZ/DgJQGqOEtfiQjgUdtshx/t6ISe3+jW3TF9hUACwADwx2Sr/fuJyyJ3QD5JYLt5Cw35wQpA==
   dependencies:
     buffer "4.9.2"
@@ -982,7 +987,7 @@ aws-sdk@^2.814.0:
 
 axios@^0.24.0:
   version "0.24.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.24.0.tgz#804e6fa1e4b9c5288501dd9dff56a7a0940d20d6"
+  resolved "https://registry.npmjs.org/axios/-/axios-0.24.0.tgz"
   integrity sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==
   dependencies:
     follow-redirects "^1.14.4"
@@ -1261,7 +1266,7 @@ commander@^2.12.1:
 
 commander@^3.0.2:
   version "3.0.2"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-3.0.2.tgz#6837c3fb677ad9933d1cfba42dd14d5117d6b39e"
+  resolved "https://registry.npmjs.org/commander/-/commander-3.0.2.tgz"
   integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
 
 component-emitter@^1.3.0:
@@ -1302,7 +1307,7 @@ cross-spawn@^7.0.2, cross-spawn@^7.0.3:
 
 crypto-js@^4.1.1:
   version "4.1.1"
-  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  resolved "https://registry.npmjs.org/crypto-js/-/crypto-js-4.1.1.tgz"
   integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 css-select@^4.1.3:
@@ -1475,7 +1480,7 @@ domutils@^2.5.2, domutils@^2.7.0, domutils@^2.8.0:
 
 douhub-helper-lambda@^1.0.32:
   version "1.0.32"
-  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.32.tgz#ac303243f81af47b6e455facd9ff8df56dbb730d"
+  resolved "https://registry.npmjs.org/douhub-helper-lambda/-/douhub-helper-lambda-1.0.32.tgz"
   integrity sha512-N1rIKe0VAKYw++YGlk6+yW30VBaqmdoCsWp5Vuekozc7/KF+TLh7jLLPowUjUqI4MInjt+r4UvAmFSxcg/D2kg==
   dependencies:
     aws-sdk "^2.1033.0"
@@ -1489,7 +1494,7 @@ douhub-helper-lambda@^1.0.32:
 
 douhub-helper-service@^1.0.26:
   version "1.0.26"
-  resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.26.tgz#77804acf912b24d78aded6f74751ea902bb0222c"
+  resolved "https://registry.npmjs.org/douhub-helper-service/-/douhub-helper-service-1.0.26.tgz"
   integrity sha512-AunCEF/lL+9KxOxTJt93hjkafirRlpQrczwNoONvBDjoSkJAgN4WnsZT06bScxiK7sktLxKVMVpJEYdDSLwyJg==
   dependencies:
     "@azure/cosmos" "^3.14.1"
@@ -1499,7 +1504,7 @@ douhub-helper-service@^1.0.26:
 
 douhub-helper-util@^1.0.36:
   version "1.0.36"
-  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.36.tgz#91d330e512ac90fc9042112d132e77eda7df2168"
+  resolved "https://registry.npmjs.org/douhub-helper-util/-/douhub-helper-util-1.0.36.tgz"
   integrity sha512-ikS4P7h0aiV4FuPeFppSWfTFaaijB8Hj5LElY/7s/Pkl/cj9tvc0h64xUFpFPrx7TtYL2YYsGUo/TsaHELZkjg==
   dependencies:
     is-url "^1.2.4"
@@ -1913,7 +1918,7 @@ flatted@^3.1.0:
 
 follow-redirects@^1.14.4:
   version "1.14.6"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.6.tgz#8cfb281bbc035b3c067d6cd975b0f6ade6e855cd"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.6.tgz"
   integrity sha512-fhUl5EwSJbbl8AR+uYL2KQDxLkdSjZGR36xy46AO7cOMTrCMON6Sa28FmAnC2tRTDbd/Uuzz3aJBv7EBN7JH8A==
 
 form-data@^3.0.0:
@@ -2012,7 +2017,7 @@ glob-parent@^6.0.1:
 
 glob-to-regexp@^0.4.1:
   version "0.4.1"
-  resolved "https://registry.yarnpkg.com/glob-to-regexp/-/glob-to-regexp-0.4.1.tgz#c75297087c851b9a578bd217dd59a92f59fe546e"
+  resolved "https://registry.npmjs.org/glob-to-regexp/-/glob-to-regexp-0.4.1.tgz"
   integrity sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==
 
 glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4:
@@ -2321,7 +2326,7 @@ is-typedarray@^1.0.0:
 
 is-url@^1.2.4:
   version "1.2.4"
-  resolved "https://registry.yarnpkg.com/is-url/-/is-url-1.2.4.tgz#04a4df46d28c4cff3d73d01ff06abeb318a1aa52"
+  resolved "https://registry.npmjs.org/is-url/-/is-url-1.2.4.tgz"
   integrity sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==
 
 is-weakref@^1.0.1:
@@ -2810,7 +2815,7 @@ jmespath@0.15.0:
 
 js-base64@^3.7.2:
   version "3.7.2"
-  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.2.tgz#816d11d81a8aff241603d19ce5761e13e41d7745"
+  resolved "https://registry.npmjs.org/js-base64/-/js-base64-3.7.2.tgz"
   integrity sha512-NnRs6dsyqUXejqk/yv2aiXlAvOs56sLkX6nUdeaNezI5LFFLlsZjOThmwnrcwh5ZZRwZlCMnVAY3CvhIhoVEKQ==
 
 js-tokens@^4.0.0:
@@ -2928,7 +2933,7 @@ levn@~0.3.0:
 
 libphonenumber-js@^1.9.42:
   version "1.9.44"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.44.tgz#d036364fe4c1e27205d1d283c7bf8fc25625200b"
+  resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.9.44.tgz"
   integrity sha512-zhw8nUMJuQf7jG1dZfEOKKOS6M3QYIv3HnvB/vGohNd0QfxIQcObH3a6Y6s350H+9xgBeOXClOJkS0hJ0yvS3g==
 
 locate-path@^2.0.0:
@@ -3371,7 +3376,7 @@ queue-microtask@^1.2.2:
 
 rate-limiter-flexible@^2.3.5:
   version "2.3.6"
-  resolved "https://registry.yarnpkg.com/rate-limiter-flexible/-/rate-limiter-flexible-2.3.6.tgz#b1a2549dca91069c8a33d57c08a27262c0356c60"
+  resolved "https://registry.npmjs.org/rate-limiter-flexible/-/rate-limiter-flexible-2.3.6.tgz"
   integrity sha512-8DVFOe89rreyut/vzwBI7vgXJynyYoYnH5XogtAKs0F/neAbCTTglXxSJ7fZeZamcFXZDvMidCBvps4KM+1srw==
 
 react-is@^17.0.1:
@@ -3539,7 +3544,7 @@ slash@^3.0.0:
 
 slugify@^1.6.4:
   version "1.6.4"
-  resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.6.4.tgz#33d84cc9e859ca3852e6537af6a5ff5bb9e439aa"
+  resolved "https://registry.npmjs.org/slugify/-/slugify-1.6.4.tgz"
   integrity sha512-Pcz296CK0uGnTf4iNQId79Uv6/5G16t0g0x3OsxWS8qVSOW+JXNnNHKVcuDiMgEGTWyK6zjlWXo2dvzV/FLf9Q==
 
 source-map-support@^0.5.6:
@@ -3944,7 +3949,7 @@ walker@^1.0.7:
 
 watchpack@^2.0.0-beta.10:
   version "2.3.1"
-  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-2.3.1.tgz#4200d9447b401156eeca7767ee610f8809bc9d25"
+  resolved "https://registry.npmjs.org/watchpack/-/watchpack-2.3.1.tgz"
   integrity sha512-x0t0JuydIo8qCNctdDrn1OzH/qDzk2+rdCOC3YzumZ42fiMqmQ7T3xQurykYMhYfHaPHTp4ZxAx2NfUo1K6QaA==
   dependencies:
     glob-to-regexp "^0.4.1"

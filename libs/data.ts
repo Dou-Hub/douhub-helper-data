@@ -711,5 +711,3 @@ export const mergeSearchFieldContent = (data:Record<string,any>, searchFields:Ar
     return cleanHTML(result, { bodyOnly: true, returnContent: 'text' });
 
 };
-
-export default { checkDuplication, retrieveRecord, query, retrieveRelatedRecords, createRecord, deleteRecord, upsertRecord, partialUpdateRecord, updateRecord, processUpsertData };

@@ -43,3 +43,16 @@ export {
     processAttributeValueTextSettings,
     processAttributeValueText
 } from './libs/data-result-processor';
+
+export {
+    createUser,
+    getUserOrgs,
+    verifyUserCode,
+} from './libs/user';
+
+export {
+    checkDuplication, retrieveRecord, 
+    query, retrieveRelatedRecords, createRecord, 
+    deleteRecord, upsertRecord, partialUpdateRecord, 
+    updateRecord, processUpsertData
+} from './libs/data';
