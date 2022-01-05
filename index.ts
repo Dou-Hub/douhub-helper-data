@@ -3,6 +3,12 @@
 //  This source code is licensed under the MIT license.
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
+import { ORGANIZATION } from './libs/data/profiles/organization';
+import { USER} from './libs/data/profiles/user';
+import { TAGS_BASE} from './libs/data/tags/tags-base';
+import { TAGS_COLORS} from './libs/data/tags/tags-colors';
+import { TAGS_NAMES} from './libs/data/tags/tags-names';
+
 export {
     hasRole,
     checkRecordPrivilege,
@@ -56,3 +62,11 @@ export {
     deleteRecord, upsertRecord, partialUpdateRecord, 
     updateRecord, processUpsertData
 } from './libs/data';
+
+export {
+    ORGANIZATION,
+    USER,
+    TAGS_BASE,
+    TAGS_COLORS,
+    TAGS_NAMES
+}
