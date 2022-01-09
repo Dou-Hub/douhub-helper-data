@@ -136,6 +136,11 @@ export const createUser = async (context: Record<string,any>, user: Record<strin
     const source = 'createUser';
     const callerUser = context.user;
 
+    //delete the attribute that should not be provided during create user
+
+    delete user.emailVerifiedOn;
+    delete user.mobileVerifiedOn;
+
     if (!isNonEmptyString(user.email) && !isNonEmptyString(user.mobile)) {
         throw {
             ...HTTPERROR_400,
