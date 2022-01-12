@@ -45,7 +45,7 @@ export {
 
 
 export {
-    processResult,
+    processResult, processResultWithUserInfo,
     processAttributeValueTextSettings,
     processAttributeValueText
 } from './libs/data-result-processor';

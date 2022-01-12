@@ -3,8 +3,9 @@
 //  This source code is licensed under the MIT license.
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
-import { map, isArray, each, find, forOwn} from 'lodash';
+import { map, isArray, each, find, forOwn,without, isFunction} from 'lodash';
 import { isObject, _track } from 'douhub-helper-util';
+import {cosmosDBQuery} from 'douhub-helper-service';
 
 export const processResult = (context:Record<string,any>, data:Array<Record<string,any>>):Array<Record<string,any>> => {
 
@@ -93,3 +94,52 @@ export const processAttributeValueText = (context:Record<string,any>, record:Rec
     return { record, context };
 
 };
+
+
+export const processResultWithUserInfo = async (
+    list: Array<Record<string, any>>, 
+    attributeName?: string, 
+    onProcessItem?:(item:Record<string,any>)=>Record<string,any>) => {
+    let userIds = '';
+    let users = {};
+    const propName = attributeName ? attributeName : 'ownedBy';
+    let queryStatement = 'SELECT u.id, u.firstName,u.lastName,u.email,u.mobile,u.avatar FROM u WHERE u.entityName=@entityName AND u.id IN (';
+    let queryParams = [
+        {
+            name: '@entityName',
+            value: 'User'
+        }
+    ];
+    //Loop through the list and generate a new list format
+    const result = without(map(list, (item: Record<string, any>) => {
+        if (isFunction(onProcessItem)) item = onProcessItem(item);
+        const userId = item[propName];
+        if (!userId) return null;
+        const paramName = `@id${userId.replace(/-/g,'')}`;
+        if (userIds == '') {
+            userIds = userId;
+            queryStatement = `${queryStatement}${paramName}`;
+            queryParams.push({ name: `${paramName}`, value: userId })
+        }
+        else {
+            if (userIds.indexOf(userId) < 0) {
+                userIds = `${userIds},${userId}`;
+                queryStatement = `${queryStatement},${paramName}`;
+                queryParams.push({ name: `${paramName}`, value: userId })
+            }
+        }
+        return { owner: item[propName], data: item };
+    }), null);
+
+    if (result.length > 0) {
+        queryStatement = `${queryStatement})`;
+        each(await cosmosDBQuery(queryStatement, queryParams), (user) => {
+            users[user.id] = user;
+        });
+    }
+
+    return map(result, (r: Record<string, any>) => {
+        r.owner = users[r.owner];
+        return r;
+    })
+}
