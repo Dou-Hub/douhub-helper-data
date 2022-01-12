@@ -403,7 +403,10 @@ export const upsertRecord = async (context: Record<string, any>, data: Record<st
 };
 
 
-export const processUpsertData = async (context: Record<string, any>, data: Record<string, any>, skipExistingData?: boolean) => {
+export const processUpsertData = async (context: Record<string, any>, data: Record<string, any>, settings?:{
+    skipExistingData?: boolean,
+    skipDuplicationCheck?: boolean
+}) => {
 
     const entityType = data.entityType;
     const entityName = data.entityName;
@@ -411,10 +414,11 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     if (!isNonEmptyString(user.id)) throw 'There is no userId or user defined in the context.';
     const isNew = !isNonEmptyString(data.id);
 
-    if (isNew) data.id = newGuid();
+    const skipExistingData = settings?.skipExistingData == true;
+    const skipDuplicationCheck = settings?.skipDuplicationCheck == true;
 
     let entity: Record<string, any> | null = null;
-    const solution = context.solution;
+    const solution = isObject(context.solution)?context.solution:{id: context.solutionId};
 
     //delete unsupported props
     delete data['_charge'];
@@ -561,9 +565,12 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
         }
     }
 
-    const checkDuplicationResult = await checkDuplication(data, isNew);
-
-    if (checkDuplicationResult) throw checkDuplicationResult;
+    if (!skipDuplicationCheck)
+    {
+        const checkDuplicationResult = await checkDuplication(data, isNew);
+        if (checkDuplicationResult) throw checkDuplicationResult;
+    }
+  
 
     if (_track) console.log({ processUpsertData: JSON.stringify(data) });
 

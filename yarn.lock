@@ -987,7 +987,7 @@ aws-sdk@^2.814.0:
 
 axios@^0.24.0:
   version "0.24.0"
-  resolved "https://registry.npmjs.org/axios/-/axios-0.24.0.tgz"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.24.0.tgz#804e6fa1e4b9c5288501dd9dff56a7a0940d20d6"
   integrity sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==
   dependencies:
     follow-redirects "^1.14.4"
@@ -1307,7 +1307,7 @@ cross-spawn@^7.0.2, cross-spawn@^7.0.3:
 
 crypto-js@^4.1.1:
   version "4.1.1"
-  resolved "https://registry.npmjs.org/crypto-js/-/crypto-js-4.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
   integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 css-select@^4.1.3:
@@ -1478,35 +1478,37 @@ domutils@^2.5.2, domutils@^2.7.0, domutils@^2.8.0:
     domelementtype "^2.2.0"
     domhandler "^4.2.0"
 
-douhub-helper-lambda@^1.0.32:
-  version "1.0.32"
-  resolved "https://registry.npmjs.org/douhub-helper-lambda/-/douhub-helper-lambda-1.0.32.tgz"
-  integrity sha512-N1rIKe0VAKYw++YGlk6+yW30VBaqmdoCsWp5Vuekozc7/KF+TLh7jLLPowUjUqI4MInjt+r4UvAmFSxcg/D2kg==
+douhub-helper-lambda@^1.0.33, douhub-helper-lambda@^1.0.35:
+  version "1.0.35"
+  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.35.tgz#4901c6a8797fa898a5a422e58a22121ab07c8000"
+  integrity sha512-TBGKCy/FvwTlVDfBHB4TKmXTSb7WuXEJ0TBvF5IiEd05aeXtxongkZVOGBhIRgvg73E+NVT8CkWplcvAlsYUgw==
   dependencies:
     aws-sdk "^2.1033.0"
     axios "^0.24.0"
     crypto-js "^4.1.1"
-    douhub-helper-service "^1.0.26"
-    douhub-helper-util "^1.0.36"
+    douhub-helper-service "^1.0.30"
+    douhub-helper-util "^1.0.40"
     lodash "^4.17.21"
     rate-limiter-flexible "^2.3.5"
     uuid "^8.3.2"
 
-douhub-helper-service@^1.0.26:
-  version "1.0.26"
-  resolved "https://registry.npmjs.org/douhub-helper-service/-/douhub-helper-service-1.0.26.tgz"
-  integrity sha512-AunCEF/lL+9KxOxTJt93hjkafirRlpQrczwNoONvBDjoSkJAgN4WnsZT06bScxiK7sktLxKVMVpJEYdDSLwyJg==
+douhub-helper-service@^1.0.30:
+  version "1.0.30"
+  resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.30.tgz#6b0dbd69bc528100a46cf9fa989edf21131a9c9a"
+  integrity sha512-t0GV+dFrhyUVdzHvze/J69jvsZvLmxaW5sAX/m54AD3bP7xOB8rvfpBHMbORTZ8CtvByVqlHczJLoJrIUpIwlQ==
   dependencies:
     "@azure/cosmos" "^3.14.1"
     aws-sdk "^2.1033.0"
+    douhub-helper-lambda "^1.0.33"
     douhub-helper-util "^1.0.36"
     lodash "^4.17.21"
 
-douhub-helper-util@^1.0.36:
-  version "1.0.36"
-  resolved "https://registry.npmjs.org/douhub-helper-util/-/douhub-helper-util-1.0.36.tgz"
-  integrity sha512-ikS4P7h0aiV4FuPeFppSWfTFaaijB8Hj5LElY/7s/Pkl/cj9tvc0h64xUFpFPrx7TtYL2YYsGUo/TsaHELZkjg==
+douhub-helper-util@^1.0.36, douhub-helper-util@^1.0.40:
+  version "1.0.40"
+  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.40.tgz#ae2b00a377948133b91551fface1150349d356eb"
+  integrity sha512-xSJhXks7LYDnvNiyBWFNKHczlz66v26Rt7LcgUbs35odRjd3BK9GxEI1EJJmV7lNfi78vrNjb5qBP7ynGK+Xlg==
   dependencies:
+    axios "^0.24.0"
     is-url "^1.2.4"
     js-base64 "^3.7.2"
     libphonenumber-js "^1.9.42"
@@ -1917,9 +1919,9 @@ flatted@^3.1.0:
   integrity sha512-8/sOawo8tJ4QOBX8YlQBMxL8+RLZfxMQOif9o0KUKTNTjMYElWPE0r/m5VNFxTRd0NSw8qSy8dajrwX4RYI1Hw==
 
 follow-redirects@^1.14.4:
-  version "1.14.6"
-  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.6.tgz"
-  integrity sha512-fhUl5EwSJbbl8AR+uYL2KQDxLkdSjZGR36xy46AO7cOMTrCMON6Sa28FmAnC2tRTDbd/Uuzz3aJBv7EBN7JH8A==
+  version "1.14.7"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.7.tgz#2004c02eb9436eee9a21446a6477debf17e81685"
+  integrity sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==
 
 form-data@^3.0.0:
   version "3.0.1"
@@ -2326,7 +2328,7 @@ is-typedarray@^1.0.0:
 
 is-url@^1.2.4:
   version "1.2.4"
-  resolved "https://registry.npmjs.org/is-url/-/is-url-1.2.4.tgz"
+  resolved "https://registry.yarnpkg.com/is-url/-/is-url-1.2.4.tgz#04a4df46d28c4cff3d73d01ff06abeb318a1aa52"
   integrity sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==
 
 is-weakref@^1.0.1:
@@ -2815,7 +2817,7 @@ jmespath@0.15.0:
 
 js-base64@^3.7.2:
   version "3.7.2"
-  resolved "https://registry.npmjs.org/js-base64/-/js-base64-3.7.2.tgz"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.2.tgz#816d11d81a8aff241603d19ce5761e13e41d7745"
   integrity sha512-NnRs6dsyqUXejqk/yv2aiXlAvOs56sLkX6nUdeaNezI5LFFLlsZjOThmwnrcwh5ZZRwZlCMnVAY3CvhIhoVEKQ==
 
 js-tokens@^4.0.0:
@@ -2933,7 +2935,7 @@ levn@~0.3.0:
 
 libphonenumber-js@^1.9.42:
   version "1.9.44"
-  resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.9.44.tgz"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.9.44.tgz#d036364fe4c1e27205d1d283c7bf8fc25625200b"
   integrity sha512-zhw8nUMJuQf7jG1dZfEOKKOS6M3QYIv3HnvB/vGohNd0QfxIQcObH3a6Y6s350H+9xgBeOXClOJkS0hJ0yvS3g==
 
 locate-path@^2.0.0:
@@ -3376,7 +3378,7 @@ queue-microtask@^1.2.2:
 
 rate-limiter-flexible@^2.3.5:
   version "2.3.6"
-  resolved "https://registry.npmjs.org/rate-limiter-flexible/-/rate-limiter-flexible-2.3.6.tgz"
+  resolved "https://registry.yarnpkg.com/rate-limiter-flexible/-/rate-limiter-flexible-2.3.6.tgz#b1a2549dca91069c8a33d57c08a27262c0356c60"
   integrity sha512-8DVFOe89rreyut/vzwBI7vgXJynyYoYnH5XogtAKs0F/neAbCTTglXxSJ7fZeZamcFXZDvMidCBvps4KM+1srw==
 
 react-is@^17.0.1:
@@ -3543,9 +3545,9 @@ slash@^3.0.0:
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
 slugify@^1.6.4:
-  version "1.6.4"
-  resolved "https://registry.npmjs.org/slugify/-/slugify-1.6.4.tgz"
-  integrity sha512-Pcz296CK0uGnTf4iNQId79Uv6/5G16t0g0x3OsxWS8qVSOW+JXNnNHKVcuDiMgEGTWyK6zjlWXo2dvzV/FLf9Q==
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.6.5.tgz#c8f5c072bf2135b80703589b39a3d41451fbe8c8"
+  integrity sha512-8mo9bslnBO3tr5PEVFzMPIWwWnipGS0xVbYf65zxDqfNwmzYn1LpiKNrR6DlClusuvo+hDHd1zKpmfAe83NQSQ==
 
 source-map-support@^0.5.6:
   version "0.5.21"

@@ -278,7 +278,7 @@ export const createUser = async (context: Record<string,any>, user: Record<strin
         context.user = user;
         context.userId = user.id;
 
-        user = await processUpsertData(context, user, true);
+        user = await processUpsertData(context, user, {skipExistingData:true});
 
         //insert user into cosmosDb
         if (_track) console.log('Create new user in the CosmsDB.', {user});
