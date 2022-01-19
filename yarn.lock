@@ -1478,10 +1478,24 @@ domutils@^2.5.2, domutils@^2.7.0, domutils@^2.8.0:
     domelementtype "^2.2.0"
     domhandler "^4.2.0"
 
-douhub-helper-lambda@^1.0.33, douhub-helper-lambda@^1.0.35:
+douhub-helper-lambda@^1.0.33:
   version "1.0.35"
   resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.35.tgz#4901c6a8797fa898a5a422e58a22121ab07c8000"
   integrity sha512-TBGKCy/FvwTlVDfBHB4TKmXTSb7WuXEJ0TBvF5IiEd05aeXtxongkZVOGBhIRgvg73E+NVT8CkWplcvAlsYUgw==
+  dependencies:
+    aws-sdk "^2.1033.0"
+    axios "^0.24.0"
+    crypto-js "^4.1.1"
+    douhub-helper-service "^1.0.30"
+    douhub-helper-util "^1.0.40"
+    lodash "^4.17.21"
+    rate-limiter-flexible "^2.3.5"
+    uuid "^8.3.2"
+
+douhub-helper-lambda@^1.0.37:
+  version "1.0.37"
+  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.37.tgz#21507dd354b9d713552f4121702e543ca44bcaf5"
+  integrity sha512-EnA87P07RKk1iTkt7Ab8Z35UcO0BWNuGjHPx4o0Z2rp0zhCiybtwkQVbIwQvdj01UaIOaf234vNjguzcdpNq6w==
   dependencies:
     aws-sdk "^2.1033.0"
     axios "^0.24.0"
@@ -1507,6 +1521,19 @@ douhub-helper-util@^1.0.36, douhub-helper-util@^1.0.40:
   version "1.0.40"
   resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.40.tgz#ae2b00a377948133b91551fface1150349d356eb"
   integrity sha512-xSJhXks7LYDnvNiyBWFNKHczlz66v26Rt7LcgUbs35odRjd3BK9GxEI1EJJmV7lNfi78vrNjb5qBP7ynGK+Xlg==
+  dependencies:
+    axios "^0.24.0"
+    is-url "^1.2.4"
+    js-base64 "^3.7.2"
+    libphonenumber-js "^1.9.42"
+    lodash "^4.17.21"
+    slugify "^1.6.4"
+    uuid "^8.3.2"
+
+douhub-helper-util@^1.0.45:
+  version "1.0.45"
+  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.45.tgz#411cbdba0d25c3f5dfe1bebb01f7aed7a3fea628"
+  integrity sha512-Q+N7vQYfS97KinLCjr6vqM7VJe29IrxD5z0APtzYNzKXcuxn193PVLQfku4g5BY5SM67fx+9WQPJgpjIVVlCHQ==
   dependencies:
     axios "^0.24.0"
     is-url "^1.2.4"

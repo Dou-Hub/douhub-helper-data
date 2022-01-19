@@ -334,7 +334,6 @@ export const updateRecord = async (context: Record<string, any>, data: Record<st
         throw HTTPERROR_403;
     }
 
-
     return await upsertRecord(context, data, 'update');
 };
 
@@ -556,13 +555,23 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
         const existingData = await cosmosDBRetrieve(data.id);
 
         if (existingData) {
-            data.licenses = existingData.licenses;
-            data.system = existingData.system;
-            data.roles = existingData.roles;
-            data.partitionKey = existingData.partitionKey;
 
             data = handlePrices(data, existingData);
+            
+            //the fields below can not be changed from update
+            data.system = existingData.system;
+            data.entityName = existingData.entityName;
+            data.partitionKey = existingData.partitionKey;
+           
+            //The licenses and roles field can not be updated in Organization and User Record
+            //There are different function to update these values
+            if (data.entityName=="Organization" || data.entityName=="User")
+            {
+                data.licenses = existingData.licenses;
+                data.roles = existingData.roles;
+            }
         }
+
     }
 
     if (!skipDuplicationCheck)

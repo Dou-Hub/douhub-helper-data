@@ -50,11 +50,6 @@ export {
     processAttributeValueText
 } from './libs/data-result-processor';
 
-export {
-    createUser,
-    getUserOrgs,
-    verifyUserCode,
-} from './libs/user';
 
 export {
     checkDuplication, retrieveRecord, 

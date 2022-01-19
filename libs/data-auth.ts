@@ -443,16 +443,40 @@ export const hasPrivilege = (context: Record<string,any>, privlege: string): boo
 export const hasRole = (context: Record<string, any>, roleName: string, record?:Record<string, any>): string|undefined => {
 
     let { user, organization } = context;
-    if (!user || isNonEmptyString(roleName)) return undefined;
+    if (!isObject(organization)) 
+    {
+        if (_track) console.error('The context.organization is not provided.');
+        return undefined;
+    }
+
+    if (!isObject(user)) 
+    {
+        if (_track) console.error('The context.user is not provided.');
+        return undefined;
+    }
+
+    if (!isNonEmptyString(roleName)) 
+    {
+        if (_track) console.error('The roleName is not provided.');
+        return undefined;
+    }
 
     if (isSolutionOwner(context, record)) return 'SOLUTION-ADMIN';
-    if (
-        !isNil(record) && roleName == 'ORG-ADMIN' && sameGuid(organization.ownedBy, user.id) && sameGuid(organization.id, record.organizationId) 
-        ||
-        isNil(record) && roleName == 'ORG-ADMIN' && sameGuid(organization.ownedBy, user.id)
-    ) return 'ORG-ADMIN';
 
-    if (!isArray(user.roles)) return undefined;
+    if (roleName == 'ORG-ADMIN')
+    {
+        if (
+            !isNil(record) && sameGuid(organization.ownedBy, user.id) && sameGuid(organization.id, record.organizationId) 
+            ||
+            isNil(record) && sameGuid(organization.ownedBy, user.id)
+        ) return 'ORG-ADMIN';
+    }
+
+    if (!isArray(user.roles)) 
+    {
+        if (_track) console.error('The user.roles does not exit.');
+        return undefined;
+    }
 
     const role = find(user.roles, (role) => {
         return role.toLowerCase() == roleName.toLowerCase();
