@@ -4,9 +4,8 @@
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
 import { isString, isArray, unionBy, isNumber, each, isNil } from 'lodash';
-import { isObject, newGuid, isNonEmptyString, _track } from 'douhub-helper-util';
+import { isObject, newGuid, isNonEmptyString, _track, checkEntityPrivilege } from 'douhub-helper-util';
 import { HTTPERROR_403 } from 'douhub-helper-lambda';
-import { checkEntityPrivilege } from './data-auth';
 
 export const DEFAULT_LOOKUP_ATTRIBUTES = 'id,avatar,firstName,lastName,fullName,name,title,display,text';
 

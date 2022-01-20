@@ -7,11 +7,11 @@ import { isString, map, assign, isNil, isArray, without, isNumber, each, endsWit
 import {
     isObject, newGuid, isNonEmptyString, _track,
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
-    utcISOString, getEntity
+    utcISOString, getEntity,
+    checkEntityPrivilege, checkRecordPrivilege 
 } from 'douhub-helper-util';
 import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING, ERROR_PARAMETER_INVALID } from 'douhub-helper-lambda';
 
-import { checkEntityPrivilege, checkRecordPrivilege } from './data-auth';
 import { processQuery } from './data-query-processor';
 import { processResult } from './data-result-processor';
 import { cleanHTML, getBaseDomain } from './data-web';

@@ -1,7 +1,7 @@
 {
   "name": "douhub-helper-data",
   "licence": "MIT",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -19,8 +19,8 @@
     "aws-sdk": "^2.1033.0",
     "cheerio": "^1.0.0-rc.10",
     "douhub-helper-lambda": "^1.0.37",
-    "douhub-helper-service": "^1.0.30",
-    "douhub-helper-util": "^1.0.45",
+    "douhub-helper-service": "^1.0.32",
+    "douhub-helper-util": "^1.0.46",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

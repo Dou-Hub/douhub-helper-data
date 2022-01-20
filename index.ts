@@ -9,21 +9,6 @@ import { TAGS_BASE} from './libs/data/tags/tags-base';
 import { TAGS_COLORS} from './libs/data/tags/tags-colors';
 import { TAGS_NAMES} from './libs/data/tags/tags-names';
 
-export {
-    hasRole,
-    checkRecordPrivilege,
-    isSolutionOwner,
-    recordOwnedByUser,
-    recordOwnedByOrganization,
-    checkLicenses,
-    hasLicense,
-    checkPrivileges,
-    checkEntityPrivilege,
-    checkPrivilege,
-    isReader,
-    isAuthor,
-    hasPrivilege
-} from './libs/data-auth';
 
 export {
     DEFAULT_LOOKUP_ATTRIBUTES,
