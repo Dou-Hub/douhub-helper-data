@@ -9,7 +9,7 @@ import {
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
     utcISOString, getEntity
 } from 'douhub-helper-util';
-import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING } from 'douhub-helper-lambda';
+import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING, ERROR_PARAMETER_INVALID } from 'douhub-helper-lambda';
 
 import { checkEntityPrivilege, checkRecordPrivilege } from './data-auth';
 import { processQuery } from './data-query-processor';
@@ -227,7 +227,7 @@ export const retrieveRelatedRecordsBase = async (
 
     if (ids.length > 0) {
         //retrieve all owner records
-        const list:Record<string,any> = {};
+        const list: Record<string, any> = {};
         each(await retrieveRecord(context, ids.split(','), resultFieldNames, true), (r) => {
             list[r.id] = r;
         });
@@ -301,7 +301,7 @@ export const deleteRecordBase = async (context: Record<string, any>, data: Recor
 
 
 //Update data is full record, otherwise use partialUpdate
-export const updateRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: Record<string, any>) => {
+export const updateRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
 
     const source = 'updateRecord';
     if (!isObject(settings)) settings = {};
@@ -334,11 +334,11 @@ export const updateRecord = async (context: Record<string, any>, data: Record<st
         throw HTTPERROR_403;
     }
 
-    return await upsertRecord(context, data, 'update');
+    return await upsertRecord(context, data, 'update', { ...settings, updateOnly: true });
 };
 
 
-export const partialUpdateRecord = async (context:Record<string,any>, data:Record<string,any>, settings?:Record<string,any>) => {
+export const partialUpdateRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
 
     const source = 'partialUpdateRecord';
 
@@ -348,13 +348,86 @@ export const partialUpdateRecord = async (context:Record<string,any>, data:Recor
             type: ERROR_PARAMETER_MISSING,
             source,
             detail: {
-                reason: 'The parameter (data) is not provided.',
-                parameters: { data }
+                reason: 'The parameter (data) is not provided.'
             }
         }
     }
 
     if (!isNonEmptyString(data.id)) {
+        throw {
+            ...HTTPERROR_400,
+            type: ERROR_PARAMETER_MISSING,
+            source,
+            detail: {
+                reason: 'The parameter (data.id) is not provided.'
+            }
+        }
+    }
+
+    //we will have to get the record first
+    const record = cosmosDBRetrieve(data.id);
+
+    if (!record) {
+        throw {
+            ...HTTPERROR_400,
+            type: ERROR_PARAMETER_INVALID,
+            source,
+            detail: {
+                reason: 'The record does not exist.',
+                parameters: { id: data.id }
+            }
+        }
+    }
+
+    return await updateRecord(context, { ...record, ...data }, settings);
+};
+
+
+//upsert will have no permission check, it is simply a base function to be called with fully trust
+export const upsertRecord = async (context: Record<string, any>, data: Record<string, any>, actionName: string, settings?: Record<string, any>): Promise<Record<string, any>> => {
+
+    if (!isObject(data)) throw 'Data is not provided.';
+
+    settings = settings ? settings : {}
+    const {
+        skipExistingData,
+        skipDuplicationCheck,
+        updateOnly
+    } = settings;
+
+    //we will process data first 
+    data = await processUpsertData(context, data, {
+        skipExistingData,
+        skipDuplicationCheck,
+        updateOnly
+    });
+    await cosmosDBUpsert(data);
+
+    const { userId, organizationId } = context;
+    await sendAction('data', data, { ignoreOrganizationId: true, ignoreUserId: true, name: actionName || 'upsert', userId, organizationId });
+
+    return data;
+};
+
+
+export const processUpsertData = async (context: Record<string, any>, data: Record<string, any>, settings?: {
+    skipExistingData?: boolean,
+    skipDuplicationCheck?: boolean,
+    updateOnly?: boolean
+}) => {
+
+    const source = 'processUpsertData';
+    const entityType = data.entityType;
+    const entityName = data.entityName;
+    const user = isObject(context.user) && context.user.id ? context.user : { id: context.userId };
+    if (!isNonEmptyString(user.id)) throw 'There is no userId or user defined in the context.';
+    const isNew = !isNonEmptyString(data.id);
+
+    const skipExistingData = settings?.skipExistingData == true;
+    const skipDuplicationCheck = settings?.skipDuplicationCheck == true;
+    const updateOnly = settings?.updateOnly == true;
+
+    if (updateOnly && isNew) {
         throw {
             ...HTTPERROR_400,
             type: ERROR_PARAMETER_MISSING,
@@ -366,58 +439,8 @@ export const partialUpdateRecord = async (context:Record<string,any>, data:Recor
         }
     }
 
-    //we will have to get the record first
-    const result = await queryRaw(context, {
-        query: 'SELECT * FROM c WHERE c.id = @id',
-        parameters: [
-            {
-                name: '@id',
-                value: data.id
-            }
-        ]
-    });
-
-    if (result.data.length == 0) throw HTTPERROR_403;
-
-    //MERGE DATA
-    data = assign({}, result.data[0], data);
-    
-    return await updateRecord(context, data, settings);
-};
-
-
-//upsert will have no permission check, it is simply a base function to be called with fully trust
-export const upsertRecord = async (context: Record<string, any>, data: Record<string, any>, actionName: string) => {
-
-    if (!isObject(data)) throw 'Data is not provided.';
-
-    //we will process data first 
-    data = await processUpsertData(context, data);
-    await cosmosDBUpsert(data);
-
-    const { userId, organizationId } = context;
-    await sendAction('data', data, { ignoreOrganizationId: true, ignoreUserId: true, name: actionName || 'upsert', userId, organizationId });
-
-    return data;
-};
-
-
-export const processUpsertData = async (context: Record<string, any>, data: Record<string, any>, settings?:{
-    skipExistingData?: boolean,
-    skipDuplicationCheck?: boolean
-}) => {
-
-    const entityType = data.entityType;
-    const entityName = data.entityName;
-    const user = isObject(context.user) && context.user.id ? context.user : { id: context.userId };
-    if (!isNonEmptyString(user.id)) throw 'There is no userId or user defined in the context.';
-    const isNew = !isNonEmptyString(data.id);
-
-    const skipExistingData = settings?.skipExistingData == true;
-    const skipDuplicationCheck = settings?.skipDuplicationCheck == true;
-
     let entity: Record<string, any> | null = null;
-    const solution = isObject(context.solution)?context.solution:{id: context.solutionId};
+    const solution = isObject(context.solution) ? context.solution : { id: context.solutionId };
 
     //delete unsupported props
     delete data['_charge'];
@@ -438,12 +461,11 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
 
     //Take care of props for search content
     entity = getEntity(solution, entityName, entityType);
-    if (entity)
-    {
+    if (entity) {
         data.searchDisplay = generateSearchDisplay(entity, data);
         data.searchContent = generateSearchContent(entity, data);
     }
-   
+
     switch (entityName) {
         case 'Organization':
             {
@@ -557,36 +579,47 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
         if (existingData) {
 
             data = handlePrices(data, existingData);
-            
+
             //the fields below can not be changed from update
             data.system = existingData.system;
             data.entityName = existingData.entityName;
             data.partitionKey = existingData.partitionKey;
-           
+
             //The licenses and roles field can not be updated in Organization and User Record
             //There are different function to update these values
-            if (data.entityName=="Organization" || data.entityName=="User")
-            {
+            if (data.entityName == "Organization" || data.entityName == "User") {
                 data.licenses = existingData.licenses;
                 data.roles = existingData.roles;
+            }
+        }
+        else {
+            if (updateOnly) {
+                throw {
+                    ...HTTPERROR_400,
+                    type: ERROR_PARAMETER_INVALID,
+                    source,
+                    detail: {
+                        reason: 'The record does (data.id) does not exist.',
+                        parameters: { data }
+                    }
+                }
             }
         }
 
     }
 
-    if (!skipDuplicationCheck)
-    {
+    if (!skipDuplicationCheck) {
         const checkDuplicationResult = await checkDuplication(data, isNew);
         if (checkDuplicationResult) throw checkDuplicationResult;
     }
-  
+
 
     if (_track) console.log({ processUpsertData: JSON.stringify(data) });
 
     return data;
 };
 
-export const handlePrices = (data:Record<string,any>, existingData:Record<string,any>) => {
+export const handlePrices = (data: Record<string, any>, existingData: Record<string, any>) => {
     if (!isNumber(data.currentPrice)) {
         delete data.currentPrice;
         delete data.prevPrice;
@@ -606,7 +639,7 @@ export const handlePrices = (data:Record<string,any>, existingData:Record<string
 
 }
 
-export const checkDuplication = async (data:Record<string,any>, isNew:boolean) => {
+export const checkDuplication = async (data: Record<string, any>, isNew: boolean) => {
 
     const entityType = data.entityType;
     const entityName = data.entityName;
@@ -666,7 +699,7 @@ export const checkDuplication = async (data:Record<string,any>, isNew:boolean) =
     return null;
 }
 
-export const generateSearchContent = (entity:Record<string,any>, data:Record<string,any>) => {
+export const generateSearchContent = (entity: Record<string, any>, data: Record<string, any>) => {
 
     let searchFields = entity && isArray(entity.searchContentFields) ? entity.searchContentFields : [];
 
@@ -687,7 +720,7 @@ export const generateSearchContent = (entity:Record<string,any>, data:Record<str
     return mergeSearchFieldContent(data, searchFields);
 };
 
-export const generateSearchDisplay = (entity:Record<string,any>, data:Record<string,any>) => {
+export const generateSearchDisplay = (entity: Record<string, any>, data: Record<string, any>) => {
 
     let searchFields = entity && isArray(entity.searchDisplayFields) ? entity.searchDisplayFields : [];
 
@@ -706,7 +739,7 @@ export const generateSearchDisplay = (entity:Record<string,any>, data:Record<str
     return mergeSearchFieldContent(data, searchFields);
 };
 
-export const mergeSearchFieldContent = (data:Record<string,any>, searchFields:Array<Record<string,any>>) => {
+export const mergeSearchFieldContent = (data: Record<string, any>, searchFields: Array<Record<string, any>>) => {
 
     const result = without(map(searchFields, (searchField) => {
         const type = isNonEmptyString(searchField.type) ? searchField.type : 'text';
