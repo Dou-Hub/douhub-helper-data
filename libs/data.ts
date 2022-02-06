@@ -8,7 +8,7 @@ import {
     isObject, newGuid, isNonEmptyString, _track,
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
     utcISOString, getEntity,
-    checkEntityPrivilege, checkRecordPrivilege 
+    checkEntityPrivilege, checkRecordPrivilege
 } from 'douhub-helper-util';
 import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING, ERROR_PARAMETER_INVALID } from 'douhub-helper-lambda';
 
@@ -69,7 +69,7 @@ export const retrieveBase = async (context: Record<string, any>, ids: string[], 
 };
 
 
-export const query = async (context: Record<string, any>, query: Record<string, any>, skipSecurityCheck: boolean): Promise<Record<string, any>> => {
+export const queryRecords = async (context: Record<string, any>, query: Record<string, any>, skipSecurityCheck: boolean): Promise<Record<string, any>> => {
     return await queryBase(context, query, skipSecurityCheck);
 };
 
@@ -293,8 +293,8 @@ export const deleteRecordBase = async (context: Record<string, any>, data: Recor
     await cosmosDBDelete(data);
 
     if (!skipAction) {
-        const { userId, organizationId } = context;
-        await sendAction('data', data, { name: 'delete', userId, organizationId });
+        const { userId, organizationId, solutionId } = context;
+        await sendAction('data', data, { name: 'delete', userId, organizationId, solutionId, requireUserId: false, requireOrganizationId: false });
     }
     return data;
 };
@@ -403,8 +403,14 @@ export const upsertRecord = async (context: Record<string, any>, data: Record<st
     });
     await cosmosDBUpsert(data);
 
-    const { userId, organizationId } = context;
-    await sendAction('data', data, { ignoreOrganizationId: true, ignoreUserId: true, name: actionName || 'upsert', userId, organizationId });
+    const { userId, organizationId, solutionId } = context;
+    await sendAction('data', data, 
+    { requireUserId: false, 
+        requireOrganizationId: false, 
+        name: actionName || 'upsert', 
+        userId, 
+        organizationId, 
+        solutionId });
 
     return data;
 };

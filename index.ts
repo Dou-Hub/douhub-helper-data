@@ -38,7 +38,7 @@ export {
 
 export {
     checkDuplication, retrieveRecord, 
-    query, retrieveRelatedRecords, createRecord, 
+    queryRecords, retrieveRelatedRecords, createRecord, 
     deleteRecord, upsertRecord, partialUpdateRecord, 
     updateRecord, processUpsertData
 } from './libs/data';
