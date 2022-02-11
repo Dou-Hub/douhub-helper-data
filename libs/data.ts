@@ -10,7 +10,7 @@ import {
     utcISOString, getEntity,
     checkEntityPrivilege, checkRecordPrivilege
 } from 'douhub-helper-util';
-import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING, ERROR_PARAMETER_INVALID } from 'douhub-helper-lambda';
+import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING, ERROR_PARAMETER_INVALID, ERROR_AUTH_FAILED, ERROR_PERMISSION_DENIED } from 'douhub-helper-lambda';
 
 import { processQuery } from './data-query-processor';
 import { processResult } from './data-result-processor';
@@ -240,7 +240,18 @@ export const retrieveRelatedRecordsBase = async (
     return data;
 };
 
-export const createRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
+
+
+export type UpsertSettings = {
+    skipExistingData?:boolean,
+    skipDuplicationCheck?:boolean,
+    updateOnly?:boolean,
+    skipSecurityCheck?:boolean
+}
+
+export const createRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
+
+    const source = 'createRecord';
 
     if (!isObject(data)) throw new Error('ERROR_API_MISSING_PARAMETERS');
 
@@ -260,11 +271,15 @@ export const createRecord = async (context: Record<string, any>, data: Record<st
         const entityName = data.entityName;
 
         if (!checkEntityPrivilege(context, entityName, entityType, 'create')) {
-            throw HTTPERROR_403;
+            throw {
+                ...HTTPERROR_403,
+                type: ERROR_PERMISSION_DENIED,
+                source
+            }
         }
     }
 
-    return await upsertRecord(context, data, 'create');
+    return await upsertRecord(context, data, 'create', {...settings, skipSecurityCheck:false});
 };
 
 export const deleteRecord = async (context: Record<string, any>, id: string, settings?: Record<string, any>): Promise<Record<string, any> | undefined> => {
@@ -301,7 +316,7 @@ export const deleteRecordBase = async (context: Record<string, any>, data: Recor
 
 
 //Update data is full record, otherwise use partialUpdate
-export const updateRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
+export const updateRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
 
     const source = 'updateRecord';
     if (!isObject(settings)) settings = {};
@@ -331,10 +346,14 @@ export const updateRecord = async (context: Record<string, any>, data: Record<st
     }
 
     if (!skipSecurityCheck && !checkRecordPrivilege(context, data, 'update')) {
-        throw HTTPERROR_403;
+        throw {
+            ...HTTPERROR_403,
+            type: ERROR_PERMISSION_DENIED,
+            source
+        }
     }
 
-    return await upsertRecord(context, data, 'update', { ...settings, updateOnly: true });
+    return await upsertRecord(context, data, 'update', { ...settings, updateOnly: true, skipSecurityCheck:true });
 };
 
 
@@ -364,6 +383,7 @@ export const partialUpdateRecord = async (context: Record<string, any>, data: Re
         }
     }
 
+
     //we will have to get the record first
     const record = cosmosDBRetrieve(data.id);
 
@@ -384,7 +404,7 @@ export const partialUpdateRecord = async (context: Record<string, any>, data: Re
 
 
 //upsert will have no permission check, it is simply a base function to be called with fully trust
-export const upsertRecord = async (context: Record<string, any>, data: Record<string, any>, actionName: string, settings?: Record<string, any>): Promise<Record<string, any>> => {
+export const upsertRecord = async (context: Record<string, any>, data: Record<string, any>, actionName: string, settings?: UpsertSettings): Promise<Record<string, any>> => {
 
     if (!isObject(data)) throw 'Data is not provided.';
 
@@ -392,8 +412,14 @@ export const upsertRecord = async (context: Record<string, any>, data: Record<st
     const {
         skipExistingData,
         skipDuplicationCheck,
-        updateOnly
+        updateOnly,
+        skipSecurityCheck
     } = settings;
+
+
+    if (!skipSecurityCheck && (data.id && !checkRecordPrivilege(context, data, 'update') || !data.id && !checkRecordPrivilege(context, data, 'create'))) {
+        throw HTTPERROR_403;
+    }
 
     //we will process data first 
     data = await processUpsertData(context, data, {
@@ -401,6 +427,8 @@ export const upsertRecord = async (context: Record<string, any>, data: Record<st
         skipDuplicationCheck,
         updateOnly
     });
+
+    
     await cosmosDBUpsert(data);
 
     const { userId, organizationId, solutionId } = context;
