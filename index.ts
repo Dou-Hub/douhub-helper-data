@@ -40,7 +40,7 @@ export {
     checkDuplication, retrieveRecord, 
     queryRecords, retrieveRelatedRecords, createRecord, 
     deleteRecord, upsertRecord, partialUpdateRecord, 
-    updateRecord, processUpsertData
+    updateRecord, processUpsertData, UpsertSettings
 } from './libs/data';
 
 export {
