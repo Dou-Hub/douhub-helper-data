@@ -7,7 +7,7 @@ import { isString, map, assign, isNil, isArray, without, isNumber, each, endsWit
 import {
     isObject, newGuid, isNonEmptyString, _track,
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
-    utcISOString, getEntity,
+    utcISOString, getEntity, getRecordFullName,
     checkEntityPrivilege, checkRecordPrivilege
 } from 'douhub-helper-util';
 import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING, ERROR_PARAMETER_INVALID, ERROR_AUTH_FAILED, ERROR_PERMISSION_DENIED } from 'douhub-helper-lambda';
@@ -481,6 +481,11 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     delete data.highlight;
     delete data.temp;
     delete data.token;
+
+    delete data.uiDoing;
+    delete data.uiDisabled;
+    delete data.uiHidden;
+
     //all xxx_info will not be allowed, because _info is system reserved for special query result
     for (var prop in data) {
         if (endsWith(prop, '_info')) delete data[prop];
@@ -498,6 +503,11 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     if (entity) {
         data.searchDisplay = generateSearchDisplay(entity, data);
         data.searchContent = generateSearchContent(entity, data);
+    }
+
+    if (data.firstName || data.lastName)
+    {
+        data.fullName = getRecordFullName(data);
     }
 
     switch (entityName) {
@@ -608,7 +618,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
 
     if (!isNew && !skipExistingData) {
 
-        const existingData = await cosmosDBRetrieve(data.id);
+        const existingData: any = await cosmosDBRetrieve(data.id);
 
         if (existingData) {
 

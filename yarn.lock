@@ -1495,75 +1495,36 @@ domutils@^2.5.2, domutils@^2.7.0, domutils@^2.8.0:
     domelementtype "^2.2.0"
     domhandler "^4.2.0"
 
-douhub-helper-lambda@^1.0.33:
-  version "1.0.35"
-  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.35.tgz#4901c6a8797fa898a5a422e58a22121ab07c8000"
-  integrity sha512-TBGKCy/FvwTlVDfBHB4TKmXTSb7WuXEJ0TBvF5IiEd05aeXtxongkZVOGBhIRgvg73E+NVT8CkWplcvAlsYUgw==
+douhub-helper-lambda@1.0.44:
+  version "1.0.44"
+  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.44.tgz#46ad4c3470a81eb51fdb02d394b422bf9b7418c3"
+  integrity sha512-ArEmDC3fGpNrXMaUnAGkBFw1+yfrusZ1WP+Ksz9ElbRyozSxJSQU1yy4DZn0FgqtOAsp2s3zkJQTZLWmKd1UyA==
   dependencies:
     aws-sdk "^2.1033.0"
     axios "^0.24.0"
     crypto-js "^4.1.1"
-    douhub-helper-service "^1.0.30"
-    douhub-helper-util "^1.0.40"
+    douhub-helper-service "^1.0.41"
+    douhub-helper-util "^1.0.55"
     lodash "^4.17.21"
     rate-limiter-flexible "^2.3.5"
     uuid "^8.3.2"
 
-douhub-helper-lambda@^1.0.40:
-  version "1.0.40"
-  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.40.tgz#91c30d98ab0d1a844bf8ce1cc8a67661957264ec"
-  integrity sha512-Y9tSM+pPfIByAwt5ReADulQbsXpErTjoLW5b3ntUWdXsaHwiCg1MjfYmmO4Ml1sW9YBG5djAmmRFZIjzBUSFRw==
-  dependencies:
-    aws-sdk "^2.1033.0"
-    axios "^0.24.0"
-    crypto-js "^4.1.1"
-    douhub-helper-service "^1.0.36"
-    douhub-helper-util "^1.0.47"
-    lodash "^4.17.21"
-    rate-limiter-flexible "^2.3.5"
-    uuid "^8.3.2"
-
-douhub-helper-service@^1.0.30:
-  version "1.0.30"
-  resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.30.tgz#6b0dbd69bc528100a46cf9fa989edf21131a9c9a"
-  integrity sha512-t0GV+dFrhyUVdzHvze/J69jvsZvLmxaW5sAX/m54AD3bP7xOB8rvfpBHMbORTZ8CtvByVqlHczJLoJrIUpIwlQ==
-  dependencies:
-    "@azure/cosmos" "^3.14.1"
-    aws-sdk "^2.1033.0"
-    douhub-helper-lambda "^1.0.33"
-    douhub-helper-util "^1.0.36"
-    lodash "^4.17.21"
-
-douhub-helper-service@^1.0.36, douhub-helper-service@^1.0.37:
-  version "1.0.37"
-  resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.37.tgz#3195c6213ad4954cd13ccd575b01869c47b54332"
-  integrity sha512-fBUAShgAx49RnGUEG+5C+Za80mM1hyyFkbmnWPIA1r4AHCdhcsuB/hCjY7nk2ThHm+u83jY2rOa8vGCY0TFZcw==
+douhub-helper-service@1.0.41, douhub-helper-service@^1.0.41:
+  version "1.0.41"
+  resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.41.tgz#a8b5bcf98a3a6a215f9a8f52e5ba62f9578d50de"
+  integrity sha512-mkLJLg9cWjlsSmX5oRJUseDebxmmY009KKr+HT34oq5mtMrHf3xpe4U1WzMKsapledVD3W72IBz4QWtzojcMgg==
   dependencies:
     "@azure/cosmos" "^3.14.1"
     "@elastic/elasticsearch" "^7.17.0"
     aws-sdk "^2.1033.0"
-    douhub-helper-lambda "^1.0.33"
-    douhub-helper-util "^1.0.36"
+    douhub-helper-util "^1.0.55"
     lodash "^4.17.21"
     qs "^6.10.3"
 
-douhub-helper-util@^1.0.36, douhub-helper-util@^1.0.40:
-  version "1.0.40"
-  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.40.tgz#ae2b00a377948133b91551fface1150349d356eb"
-  integrity sha512-xSJhXks7LYDnvNiyBWFNKHczlz66v26Rt7LcgUbs35odRjd3BK9GxEI1EJJmV7lNfi78vrNjb5qBP7ynGK+Xlg==
-  dependencies:
-    axios "^0.24.0"
-    is-url "^1.2.4"
-    js-base64 "^3.7.2"
-    libphonenumber-js "^1.9.42"
-    lodash "^4.17.21"
-    slugify "^1.6.4"
-    uuid "^8.3.2"
-
-douhub-helper-util@^1.0.47:
-  version "1.0.47"
-  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.47.tgz#f0e14c747a2c35c236119f30f14b0ef0c5c918b6"
-  integrity sha512-5Y1hFE76NEo3Xljxjw90fYwN1aB8VYIiV5m0TQmchIt5lm11sLchPGh/H4PK8ngVjh5T0IwrCX0FrOdas2MR1g==
+douhub-helper-util@1.0.55, douhub-helper-util@^1.0.55:
+  version "1.0.55"
+  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.55.tgz#960d00da62c47ad135d27c1e839157cd531116df"
+  integrity sha512-zuqIEHh6NoIIweRI8w9XhI7SDB8p//Pn6Z/n8AdKmWzXHT8g7ASSkn5gLntmbgKqm0t/TPoPq1P6EFmLmXuH9g==
   dependencies:
     axios "^0.24.0"
     is-url "^1.2.4"
