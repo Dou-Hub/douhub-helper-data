@@ -279,7 +279,7 @@ export const createRecord = async (context: Record<string, any>, data: Record<st
         }
     }
 
-    return await upsertRecord(context, data, 'create', {...settings, skipSecurityCheck:false});
+    return await upsertRecord(context, data, 'create', {...settings, skipSecurityCheck});
 };
 
 export const deleteRecord = async (context: Record<string, any>, id: string, settings?: Record<string, any>): Promise<Record<string, any> | undefined> => {
