@@ -243,10 +243,10 @@ export const retrieveRelatedRecordsBase = async (
 
 
 export type UpsertSettings = {
-    skipExistingData?:boolean,
-    skipDuplicationCheck?:boolean,
-    updateOnly?:boolean,
-    skipSecurityCheck?:boolean
+    skipExistingData?: boolean,
+    skipDuplicationCheck?: boolean,
+    updateOnly?: boolean,
+    skipSecurityCheck?: boolean
 }
 
 export const createRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
@@ -279,7 +279,7 @@ export const createRecord = async (context: Record<string, any>, data: Record<st
         }
     }
 
-    return await upsertRecord(context, data, 'create', {...settings, skipSecurityCheck});
+    return await upsertRecord(context, data, 'create', { ...settings, skipSecurityCheck });
 };
 
 export const deleteRecord = async (context: Record<string, any>, id: string, settings?: Record<string, any>): Promise<Record<string, any> | undefined> => {
@@ -353,7 +353,7 @@ export const updateRecord = async (context: Record<string, any>, data: Record<st
         }
     }
 
-    return await upsertRecord(context, data, 'update', { ...settings, updateOnly: true, skipSecurityCheck:true });
+    return await upsertRecord(context, data, 'update', { ...settings, updateOnly: true, skipSecurityCheck: true });
 };
 
 
@@ -428,19 +428,21 @@ export const upsertRecord = async (context: Record<string, any>, data: Record<st
         updateOnly
     });
 
-    
+
     data = await cosmosDBUpsert(data);
 
     const { userId, organizationId, solutionId } = context;
-    await sendAction('data', data, 
-    { requireUserId: false, 
-        requireOrganizationId: false, 
-        name: actionName || 'upsert', 
-        userId, 
-        organizationId, 
-        solutionId });
-        return data;
-    };
+    await sendAction('data', data,
+        {
+            requireUserId: false,
+            requireOrganizationId: false,
+            name: actionName || 'upsert',
+            userId,
+            organizationId,
+            solutionId
+        });
+    return data;
+};
 
 
 export const processUpsertData = async (context: Record<string, any>, data: Record<string, any>, settings?: {
@@ -504,8 +506,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
         data.searchContent = generateSearchContent(entity, data);
     }
 
-    if (data.firstName || data.lastName)
-    {
+    if (data.firstName || data.lastName) {
         data.fullName = getRecordFullName(data, true);
     }
 
