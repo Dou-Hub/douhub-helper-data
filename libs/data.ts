@@ -429,7 +429,7 @@ export const upsertRecord = async (context: Record<string, any>, data: Record<st
     });
 
     
-    await cosmosDBUpsert(data);
+    data = await cosmosDBUpsert(data);
 
     const { userId, organizationId, solutionId } = context;
     await sendAction('data', data, 
@@ -439,9 +439,8 @@ export const upsertRecord = async (context: Record<string, any>, data: Record<st
         userId, 
         organizationId, 
         solutionId });
-
-    return data;
-};
+        return data;
+    };
 
 
 export const processUpsertData = async (context: Record<string, any>, data: Record<string, any>, settings?: {
@@ -507,7 +506,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
 
     if (data.firstName || data.lastName)
     {
-        data.fullName = getRecordFullName(data);
+        data.fullName = getRecordFullName(data, true);
     }
 
     switch (entityName) {

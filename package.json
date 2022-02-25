@@ -1,7 +1,7 @@
 {
   "name": "douhub-helper-data",
   "licence": "MIT",
-  "version": "1.0.23",
+  "version": "1.0.37",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -18,14 +18,18 @@
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1033.0",
     "cheerio": "^1.0.0-rc.10",
-    "douhub-helper-lambda": "1.0.44",
-    "douhub-helper-service": "1.0.41",
-    "douhub-helper-util": "1.0.55",
-    "lodash": "^4.17.21"
+    "douhub-helper-lambda": "1.0.50",
+    "douhub-helper-service": "1.0.46",
+    "douhub-helper-util": "1.0.58",
+    "lodash": "^4.17.21",
+    "marked": "^4.0.12",
+    "moment": "^2.29.1",
+    "read-time-estimate": "^0.0.3"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.85",
     "@types/lodash": "^4.14.177",
+    "@types/marked": "^4.0.2",
     "@types/node": "^16.11.6",
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.4.0",

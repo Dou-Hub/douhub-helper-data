@@ -712,6 +712,11 @@
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.177.tgz"
   integrity sha512-0fDwydE2clKe9MNfvXHBHF9WEahRuj+msTuQqOmAApNORFvhMYZKNGGJdCzuhheVjMps/ti0Ak/iJPACMaevvw==
 
+"@types/marked@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/marked/-/marked-4.0.2.tgz#cb2dbf10da2f41cf20bd91fb5f89b67540c282f7"
+  integrity sha512-auNrZ/c0w6wsM9DccwVxWHssrMDezHUAXNesdp2RQrCVCyrQbOiSq7yqdJKrUQQpw9VTm7CGYJH2A/YG7jjrjQ==
+
 "@types/node@*":
   version "17.0.6"
   resolved "https://registry.npmjs.org/@types/node/-/node-17.0.6.tgz"
@@ -1495,10 +1500,10 @@ domutils@^2.5.2, domutils@^2.7.0, domutils@^2.8.0:
     domelementtype "^2.2.0"
     domhandler "^4.2.0"
 
-douhub-helper-lambda@1.0.44:
-  version "1.0.44"
-  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.44.tgz#46ad4c3470a81eb51fdb02d394b422bf9b7418c3"
-  integrity sha512-ArEmDC3fGpNrXMaUnAGkBFw1+yfrusZ1WP+Ksz9ElbRyozSxJSQU1yy4DZn0FgqtOAsp2s3zkJQTZLWmKd1UyA==
+douhub-helper-lambda@1.0.50:
+  version "1.0.50"
+  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.50.tgz#469b617f838ff6660e196b17b0e7f52eee2303ea"
+  integrity sha512-xxtbXTNiK1QBg4zzFpmmQUKNyA+49b/DlH91XLSo98OGjqrI6wb2aRUDr9E5BmTa3gVW2/9Hl9VDGl//CcIqOg==
   dependencies:
     aws-sdk "^2.1033.0"
     axios "^0.24.0"
@@ -1509,7 +1514,19 @@ douhub-helper-lambda@1.0.44:
     rate-limiter-flexible "^2.3.5"
     uuid "^8.3.2"
 
-douhub-helper-service@1.0.41, douhub-helper-service@^1.0.41:
+douhub-helper-service@1.0.46:
+  version "1.0.46"
+  resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.46.tgz#8a0838aa6f8b5a0179052e3526befc60d4423999"
+  integrity sha512-qx4fw5uO0gyJT6CAX71dIZxyGvDlKnT7nVwAbjRC8ttOC1VMv7Q2cbm264oFquopo0mnudRUpbJ/zN337XPs6A==
+  dependencies:
+    "@azure/cosmos" "^3.14.1"
+    "@elastic/elasticsearch" "^7.17.0"
+    aws-sdk "^2.1033.0"
+    douhub-helper-util "1.0.58"
+    lodash "^4.17.21"
+    qs "^6.10.3"
+
+douhub-helper-service@^1.0.41:
   version "1.0.41"
   resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.41.tgz#a8b5bcf98a3a6a215f9a8f52e5ba62f9578d50de"
   integrity sha512-mkLJLg9cWjlsSmX5oRJUseDebxmmY009KKr+HT34oq5mtMrHf3xpe4U1WzMKsapledVD3W72IBz4QWtzojcMgg==
@@ -1521,7 +1538,20 @@ douhub-helper-service@1.0.41, douhub-helper-service@^1.0.41:
     lodash "^4.17.21"
     qs "^6.10.3"
 
-douhub-helper-util@1.0.55, douhub-helper-util@^1.0.55:
+douhub-helper-util@1.0.58:
+  version "1.0.58"
+  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.58.tgz#b2f5620f2d3621817e1c0e65633c708662ab9a1a"
+  integrity sha512-vv5OVA3Q52lLFQn/yPxYE6BC3WCVQOAlbAMke72wv7MwSa7ycjJPETel6qqKPNQCe/yX2Iu17rQISCZ5/NQV+Q==
+  dependencies:
+    axios "^0.24.0"
+    is-url "^1.2.4"
+    js-base64 "^3.7.2"
+    libphonenumber-js "^1.9.42"
+    lodash "^4.17.21"
+    slugify "^1.6.4"
+    uuid "^8.3.2"
+
+douhub-helper-util@^1.0.55:
   version "1.0.55"
   resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.55.tgz#960d00da62c47ad135d27c1e839157cd531116df"
   integrity sha512-zuqIEHh6NoIIweRI8w9XhI7SDB8p//Pn6Z/n8AdKmWzXHT8g7ASSkn5gLntmbgKqm0t/TPoPq1P6EFmLmXuH9g==
@@ -3007,6 +3037,11 @@ makeerror@1.0.12:
   dependencies:
     tmpl "1.0.5"
 
+marked@^4.0.12:
+  version "4.0.12"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-4.0.12.tgz#2262a4e6fd1afd2f13557726238b69a48b982f7d"
+  integrity sha512-hgibXWrEDNBWgGiK18j/4lkS6ihTe9sxtV4Q1OQppb/0zzyPSzoFANBa5MfsG/zgsWklmNnhm0XACZOH/0HBiQ==
+
 merge-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/merge-stream/-/merge-stream-2.0.0.tgz"
@@ -3070,6 +3105,11 @@ mkdirp@^0.5.3:
   integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
   dependencies:
     minimist "^1.2.5"
+
+moment@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
+  integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
 
 ms@2.0.0:
   version "2.0.0"
@@ -3415,6 +3455,11 @@ react-is@^17.0.1:
   version "17.0.2"
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
+
+read-time-estimate@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/read-time-estimate/-/read-time-estimate-0.0.3.tgz#3791c6715b0625252f491f74851a12a8dfc2055a"
+  integrity sha512-TF87eHTuEyRtu/mwnQE8FoZYHpsN1Oj+U/oROL5nrsoEWsh/iGhBzkV50N6DdPEqZ9Jh2PSZk1ZA7KMucgb+ng==
 
 readable-stream@^3.6.0:
   version "3.6.0"
