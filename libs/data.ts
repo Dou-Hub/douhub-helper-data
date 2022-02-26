@@ -629,6 +629,11 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
             data.entityName = existingData.entityName;
             data.partitionKey = existingData.partitionKey;
 
+            //emailVerificationCode and mobileVerificationCode can not be updated by the normal update function
+            //it will be updated by special functions such as activate user
+            data.emailVerificationCode = existingData.emailVerificationCode;
+            data.mobileVerificationCode = existingData.mobileVerificationCode;
+
             //The licenses and roles field can not be updated in Organization and User Record
             //There are different function to update these values
             if (data.entityName == "Organization" || data.entityName == "User") {
