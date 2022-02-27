@@ -634,6 +634,9 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
             data.emailVerificationCode = existingData.emailVerificationCode;
             data.mobileVerificationCode = existingData.mobileVerificationCode;
 
+            data.statusCode = existingData.statusCode;
+            data.stateCode = existingData.stateCode;
+
             //The licenses and roles field can not be updated in Organization and User Record
             //There are different function to update these values
             if (data.entityName == "Organization" || data.entityName == "User") {
