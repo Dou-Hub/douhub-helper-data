@@ -3,7 +3,7 @@
 //  This source code is licensed under the MIT license.
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
-import { isString, map, assign, isNil, isArray, without, isNumber, each, endsWith } from 'lodash';
+import { isString, map, assign, isNil, isArray, without, isNumber, each, endsWith, cloneDeep } from 'lodash';
 import {
     isObject, newGuid, isNonEmptyString, _track,
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
@@ -156,9 +156,10 @@ export const queryRaw = async (context: Record<string, any>, query: Record<strin
 
 };
 
-export const retrieveRelatedRecords = async (context: Record<string, any>, query: Record<string, any>, data: Array<Record<string, any>>): Promise<Array<Record<string, any>>> => {
+export const retrieveRelatedRecords = async (context: Record<string, any>, query: Record<string, any>, records: Array<Record<string, any>>): Promise<Array<Record<string, any>>> => {
 
-    if (!isArray(data)) data = [];
+    if (!isArray(records) || isArray(records) && records.length == 0) return [];
+    let data = cloneDeep(records);
 
     if (query.includeOwnerInfo) {
 
@@ -212,9 +213,10 @@ export const retrieveRelatedRecordsBase = async (
     idFieldName: string,
     resultFieldNames: string[],
     objectFieldName: string,
-    data: Array<Record<string, any>>): Promise<Array<Record<string, any>>> => {
+    records: Array<Record<string, any>>): Promise<Array<Record<string, any>>> => {
 
-    if (data.length == 0) return [];
+    if (!isArray(records) || isArray(records) && records.length == 0) return [];
+    let data = cloneDeep(records);
 
     //we need get all ids 
     let ids = '';
@@ -249,11 +251,13 @@ export type UpsertSettings = {
     skipSecurityCheck?: boolean
 }
 
-export const createRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
+export const createRecord = async (context: Record<string, any>, record: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
 
     const source = 'createRecord';
 
-    if (!isObject(data)) throw new Error('ERROR_API_MISSING_PARAMETERS');
+    if (!isObject(record)) throw new Error('ERROR_API_MISSING_PARAMETERS');
+
+    const data = cloneDeep(record);
 
     const { userId } = context;
     const utcNow = utcISOString();
@@ -291,11 +295,12 @@ export const deleteRecord = async (context: Record<string, any>, id: string, set
 };
 
 
-export const deleteRecordBase = async (context: Record<string, any>, data: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
+export const deleteRecordBase = async (context: Record<string, any>, record: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
 
-    if (!isObject(data)) return data;
-
+    if (!isObject(record)) return record;
     if (!isObject(settings)) settings = {};
+
+    const data = cloneDeep(record);
 
     const skipSecurityCheck = settings?.skipSecurityCheck == true;
     const skipAction = settings?.skipAction == true;
@@ -316,36 +321,36 @@ export const deleteRecordBase = async (context: Record<string, any>, data: Recor
 
 
 //Update data is full record, otherwise use partialUpdate
-export const updateRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
+export const updateRecord = async (context: Record<string, any>, record: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
 
     const source = 'updateRecord';
     if (!isObject(settings)) settings = {};
     const skipSecurityCheck = settings?.skipSecurityCheck == true;
 
-    if (!isObject(data)) {
+    if (!isObject(record)) {
         throw {
             ...HTTPERROR_400,
             type: ERROR_PARAMETER_MISSING,
             source,
             detail: {
-                reason: 'The parameter (data) is not provided.',
-                parameters: { data }
+                reason: 'The parameter (record) is not provided.',
+                parameters: { record }
             }
         }
     }
-    if (!isNonEmptyString(data.id)) {
+    if (!isNonEmptyString(record.id)) {
         throw {
             ...HTTPERROR_400,
             type: ERROR_PARAMETER_MISSING,
             source,
             detail: {
-                reason: 'The parameter (data.id) is not provided.',
-                parameters: { data }
+                reason: 'The parameter (record.id) is not provided.',
+                parameters: { record }
             }
         }
     }
 
-    if (!skipSecurityCheck && !checkRecordPrivilege(context, data, 'update')) {
+    if (!skipSecurityCheck && !checkRecordPrivilege(context, record, 'update')) {
         throw {
             ...HTTPERROR_403,
             type: ERROR_PERMISSION_DENIED,
@@ -353,60 +358,63 @@ export const updateRecord = async (context: Record<string, any>, data: Record<st
         }
     }
 
-    return await upsertRecord(context, data, 'update', { ...settings, updateOnly: true, skipSecurityCheck: true });
+    return await upsertRecord(context, record, 'update', { ...settings, updateOnly: true, skipSecurityCheck: true });
 };
 
 
-export const partialUpdateRecord = async (context: Record<string, any>, data: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
+export const partialUpdateRecord = async (context: Record<string, any>, record: Record<string, any>, settings?: Record<string, any>): Promise<Record<string, any>> => {
 
     const source = 'partialUpdateRecord';
 
-    if (!isObject(data)) {
+    if (!isObject(record)) {
         throw {
             ...HTTPERROR_400,
             type: ERROR_PARAMETER_MISSING,
             source,
             detail: {
-                reason: 'The parameter (data) is not provided.'
+                reason: 'The parameter (record) is not provided.'
             }
         }
     }
 
-    if (!isNonEmptyString(data.id)) {
+    if (!isNonEmptyString(record.id)) {
         throw {
             ...HTTPERROR_400,
             type: ERROR_PARAMETER_MISSING,
             source,
             detail: {
-                reason: 'The parameter (data.id) is not provided.'
+                reason: 'The parameter (record.id) is not provided.'
             }
         }
     }
 
 
     //we will have to get the record first
-    const record = cosmosDBRetrieve(data.id);
+    const existingRecord = cosmosDBRetrieve(record.id);
 
-    if (!record) {
+    if (!existingRecord) {
         throw {
             ...HTTPERROR_400,
             type: ERROR_PARAMETER_INVALID,
             source,
             detail: {
                 reason: 'The record does not exist.',
-                parameters: { id: data.id }
+                parameters: { id: record.id }
             }
         }
     }
 
-    return await updateRecord(context, { ...record, ...data }, settings);
+    return await updateRecord(context, { ...existingRecord, ...record }, settings);
 };
 
 
 //upsert will have no permission check, it is simply a base function to be called with fully trust
-export const upsertRecord = async (context: Record<string, any>, data: Record<string, any>, actionName: string, settings?: UpsertSettings): Promise<Record<string, any>> => {
+export const upsertRecord = async (context: Record<string, any>, record: Record<string, any>, actionName: string, settings?: UpsertSettings): Promise<Record<string, any>> => {
 
-    if (!isObject(data)) throw 'Data is not provided.';
+
+    if (!isObject(record)) throw 'The record is not provided.';
+
+    let data = cloneDeep(record);
 
     settings = settings ? settings : {}
     const {

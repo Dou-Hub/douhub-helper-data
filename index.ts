@@ -19,7 +19,7 @@ export {
     handleTagConditions,
     handleSecurityConditions,
     handleSecurityCondition_Scope,
-    handleSolutionConditions,
+    // handleSolutionConditions,
     handleScopeCondition,
     handleIdCondition,
     handleIdsCondition,

@@ -78,7 +78,7 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
     if (isNonEmptyString(req.ownedBy)) req.conditions.push({ attribute: 'ownedBy', op: '=', value: req.ownedBy });
     if (isNonEmptyString(req.regardingId)) req.conditions.push({ attribute: 'regardingId', op: '=', value: req.regardingId });
 
-    req = handleSolutionConditions(req);
+    // req = handleSolutionConditions(req);
 
     req = handleCategoryConditions(req);
     req = handleTagConditions(req);
@@ -100,7 +100,7 @@ export const groupConditions = (req:Record<string,any>):Record<string,any> => {
         //conditions can be object or string
         if (isObject(req.conditions[i])) {
             const paramName = `@p${newGuid().replace(/-/g, '')}`;
-            const paramValue = req.conditions[i].value ? req.conditions[i].value : '';
+            const paramValue = !isNil(req.conditions[i].value) ? req.conditions[i].value : '';
             req.parameters.push({ name: paramName, value: paramValue });
 
             const attribute = isNonEmptyString(req.conditions[i].attribute) ? 'c.' + req.conditions[i].attribute : '';
@@ -111,6 +111,31 @@ export const groupConditions = (req:Record<string,any>):Record<string,any> => {
                     case 'SEARCH':
                         {
                             req.conditions[i] = `(CONTAINS(LOWER(c.searchDisplay), ${paramName}) OR CONTAINS(LOWER(c.searchContent), ${paramName}))`;
+                            break;
+                        }
+                    case 'ARRAY_CONTAINS':
+                        {
+                            req.conditions[i] = `${op}(${attribute}, ${paramName})`;
+                            break;
+                        }
+                    case 'IN':
+                        {
+                            if (isArray(req.paramValues) && req.paramValues.length > 0) {
+                                let condition = '';
+                        
+                                for (var i = 0; i < req.ids.length; i++) {
+                                    if (i == 0) {
+                                        condition = `${attribute} IN (${paramName}${i}`;
+                                    }
+                                    else {
+                                        condition = `${condition} ,${paramName}${i}`;
+                                    }
+                                    if (i == req.paramValues.length - 1) condition = `${condition})`;
+                                    req.parameters.push({ name: `${paramName}${i}`, value: req.paramValues[i] });
+                                }
+                        
+                                req.conditions[i] = condition;
+                            }
                             break;
                         }
                     case 'CONTAINS':
@@ -216,17 +241,17 @@ export const handleSecurityCondition_Scope = (req:Record<string,any>):Record<str
     return req;
 };
 
-export const handleSolutionConditions = (req:Record<string,any>):Record<string,any> => {
+// export const handleSolutionConditions = (req:Record<string,any>):Record<string,any> => {
 
-    if (
-        req.entityName == 'SolutionDashboard' ||
-        req.entityName == 'Site' ||
-        req.entityName == 'Localization' ||
-        req.entityName == 'SolutionDefinition') {
-        req.conditions.push('c.ownerId = @solutionId');
-    }
-    return req;
-};
+//     if (
+//         req.entityName == 'SolutionDashboard' ||
+//         req.entityName == 'Site' ||
+//         req.entityName == 'Localization' ||
+//         req.entityName == 'SolutionDefinition') {
+//         req.conditions.push('c.ownerId = @solutionId');
+//     }
+//     return req;
+// };
 
 export const handleScopeCondition = (req:Record<string,any>):Record<string,any> => {
 
