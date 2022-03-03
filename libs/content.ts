@@ -123,7 +123,7 @@ export const processContent = async (
         hasArrayContain?: boolean,
         keepUnhandedPlaceholder?: boolean,
         props?: string,
-        hasHTML?:boolean,
+        hasHTML?: boolean,
         onInit?: (content: string) => string
     }): Promise<string> => {
 
@@ -133,8 +133,7 @@ export const processContent = async (
     if (!isNonEmptyString(content)) return '';
     if (!isNonEmptyString(prefix)) prefix = 'PH';
 
-    if (init && settings)
-    {
+    if (init && settings) {
         settings.hasMarkdown = content.indexOf(`.MARKDOWN]`) > 0;
         settings.hasQueryEncode = content.indexOf(`.QUERYENCODE]`) > 0;
         settings.hasReadtime = content.indexOf(`.READTIME]`) > 0;
@@ -157,7 +156,7 @@ export const processContent = async (
         content = processSearchResult(content, r);
     }
 
-   
+
     //replace some special placeholders
     //handle fullName
     const rFullName: any = getRecordFullName(r);
