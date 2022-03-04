@@ -1514,21 +1514,21 @@ domutils@^2.5.2, domutils@^2.7.0, domutils@^2.8.0:
     domelementtype "^2.2.0"
     domhandler "^4.2.0"
 
-douhub-helper-lambda@1.0.51:
-  version "1.0.51"
-  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.51.tgz#e0478ac15e39e95d224b40811091a25b3a5b0eb4"
-  integrity sha512-cG2i21CMJ5c0Eg8M5h4Q63K4oI0fd7Zx9oPSIZkI7uSF7IdpcWXVgrtlzftYowb+wqvoOJoRylEq++S7t0wDUw==
+douhub-helper-lambda@1.0.53:
+  version "1.0.53"
+  resolved "https://registry.yarnpkg.com/douhub-helper-lambda/-/douhub-helper-lambda-1.0.53.tgz#39e7d85f46ece5347841d80299a4fa35ceeac6bc"
+  integrity sha512-hPhUsL2buU2geMVsS3Uajgkax/I+/FeLO4c3XQc7ybUH0u1BzCqvHrTPItN0tUvrSbxwif725cex6T8uVHkS5Q==
   dependencies:
     aws-sdk "^2.1033.0"
     axios "^0.24.0"
     crypto-js "^4.1.1"
-    douhub-helper-service "^1.0.48"
-    douhub-helper-util "^1.0.58"
+    douhub-helper-service "^1.0.49"
+    douhub-helper-util "^1.0.70"
     lodash "^4.17.21"
     rate-limiter-flexible "^2.3.5"
     uuid "^8.3.2"
 
-douhub-helper-service@1.0.49, douhub-helper-service@^1.0.48:
+douhub-helper-service@1.0.49, douhub-helper-service@^1.0.49:
   version "1.0.49"
   resolved "https://registry.yarnpkg.com/douhub-helper-service/-/douhub-helper-service-1.0.49.tgz#6c81d6c6286e80b78955e6ec980a03094e5fc22a"
   integrity sha512-VafRl8lkAdHqLFnr38gpOrd1TRkBROOGBZEv84DKJ+jdQoGwFk0xqTtBcuh/WM3ta+J3ePHyWMbdPFB58k+ypQ==
@@ -1553,10 +1553,10 @@ douhub-helper-util@1.0.64:
     slugify "^1.6.4"
     uuid "^8.3.2"
 
-douhub-helper-util@1.0.68, douhub-helper-util@^1.0.58:
-  version "1.0.68"
-  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.68.tgz#59a75175146bbac02f02f2e79f70abf1a53ca733"
-  integrity sha512-DhRSyhi4iuOlhVa8dtinba+eBLJzvgxsq51AZda3jVUzc7SjIQ1+weEwRbLLnUJkWZOmZwQ54jbPC8ciPcmA4A==
+douhub-helper-util@1.0.70, douhub-helper-util@^1.0.70:
+  version "1.0.70"
+  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.70.tgz#1a94fcb4d7727c0d31a112473339e4cc712f3bff"
+  integrity sha512-MiuLtGCP3eQgB/5GtN6DW2O80tLzUM9kzQ4f97s0c/GbBtMzyzWpbvbdX+2D0klQmk4oQelOBTtKOZoitxx/9Q==
   dependencies:
     axios "^0.24.0"
     csvtojson "^2.0.10"

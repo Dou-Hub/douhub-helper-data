@@ -255,7 +255,30 @@ export const createRecord = async (context: Record<string, any>, record: Record<
 
     const source = 'createRecord';
 
-    if (!isObject(record)) throw new Error('ERROR_API_MISSING_PARAMETERS');
+    if (!isObject(record)) {
+        throw {
+            ...HTTPERROR_400,
+            type: ERROR_PARAMETER_MISSING,
+            source,
+            detail: {
+                reason: 'The parameter (record) is not provided.',
+                parameters: { record }
+            }
+        }
+    }
+    
+    if (!isNonEmptyString(record.entityName))
+    {
+        throw {
+            ...HTTPERROR_403,
+            type: ERROR_PARAMETER_MISSING,
+            source,
+            detail: {
+                reason: 'The parameter (record.entityName) is not provided.',
+                parameters: { record }
+            }
+        }
+    }
 
     const data = cloneDeep(record);
 
@@ -269,6 +292,8 @@ export const createRecord = async (context: Record<string, any>, record: Record<
     data.createdOn = utcNow;
     data.ownedBy = userId;
     data.ownedOn = utcNow;
+
+    
 
     if (!skipSecurityCheck) {
         const entityType = data.entityType;
@@ -338,6 +363,7 @@ export const updateRecord = async (context: Record<string, any>, record: Record<
             }
         }
     }
+
     if (!isNonEmptyString(record.id)) {
         throw {
             ...HTTPERROR_400,
@@ -346,6 +372,18 @@ export const updateRecord = async (context: Record<string, any>, record: Record<
             detail: {
                 reason: 'The parameter (record.id) is not provided.',
                 parameters: { record }
+            }
+        }
+    }
+
+    if (!isNonEmptyString(record.entityName))
+    {
+        throw {
+            ...HTTPERROR_403,
+            type: ERROR_PARAMETER_MISSING,
+            source,
+            detail: {
+                reason: 'record.entityName'
             }
         }
     }
