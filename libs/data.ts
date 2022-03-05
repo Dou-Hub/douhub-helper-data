@@ -248,7 +248,8 @@ export type UpsertSettings = {
     skipExistingData?: boolean,
     skipDuplicationCheck?: boolean,
     updateOnly?: boolean,
-    skipSecurityCheck?: boolean
+    skipSecurityCheck?: boolean,
+    skipSystemPropertyCheck?:boolean
 }
 
 export const createRecord = async (context: Record<string, any>, record: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
@@ -287,7 +288,7 @@ export const createRecord = async (context: Record<string, any>, record: Record<
 
     if (!isObject(settings)) settings = {};
     const skipSecurityCheck = settings?.skipSecurityCheck == true;
-
+   
     data.createdBy = userId;
     data.createdOn = utcNow;
     data.ownedBy = userId;
@@ -308,7 +309,7 @@ export const createRecord = async (context: Record<string, any>, record: Record<
         }
     }
 
-    return await upsertRecord(context, data, 'create', { ...settings, skipSecurityCheck });
+    return await upsertRecord(context, data, 'create', settings);
 };
 
 export const deleteRecord = async (context: Record<string, any>, id: string, settings?: Record<string, any>): Promise<Record<string, any> | undefined> => {
@@ -457,11 +458,13 @@ export const upsertRecord = async (context: Record<string, any>, record: Record<
     settings = settings ? settings : {}
     const {
         skipExistingData,
-        skipDuplicationCheck,
         updateOnly,
-        skipSecurityCheck
     } = settings;
 
+    const skipSecurityCheck = settings?.skipSecurityCheck == true;
+    const skipSystemPropertyCheck = settings?.skipSystemPropertyCheck == true;
+    const skipDuplicationCheck = settings?.skipDuplicationCheck == true;
+    
 
     if (!skipSecurityCheck && (data.id && !checkRecordPrivilege(context, data, 'update') || !data.id && !checkRecordPrivilege(context, data, 'create'))) {
         throw HTTPERROR_403;
@@ -471,6 +474,7 @@ export const upsertRecord = async (context: Record<string, any>, record: Record<
     data = await processUpsertData(context, data, {
         skipExistingData,
         skipDuplicationCheck,
+        skipSystemPropertyCheck,
         updateOnly
     });
 
@@ -494,7 +498,8 @@ export const upsertRecord = async (context: Record<string, any>, record: Record<
 export const processUpsertData = async (context: Record<string, any>, data: Record<string, any>, settings?: {
     skipExistingData?: boolean,
     skipDuplicationCheck?: boolean,
-    updateOnly?: boolean
+    updateOnly?: boolean,
+    skipSystemPropertyCheck?: boolean
 }) => {
 
     const source = 'processUpsertData';
@@ -507,6 +512,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     const skipExistingData = settings?.skipExistingData == true;
     const skipDuplicationCheck = settings?.skipDuplicationCheck == true;
     const updateOnly = settings?.updateOnly == true;
+    const skipSystemPropertyCheck = settings?.skipSystemPropertyCheck == true;
 
     if (updateOnly && isNew) {
         throw {
@@ -685,7 +691,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
 
             //The licenses and roles field can not be updated in Organization and User Record
             //There are different function to update these values
-            if (data.entityName == "Organization" || data.entityName == "User") {
+            if (!skipSystemPropertyCheck && (data.entityName == "Organization" || data.entityName == "User")) {
                 data.licenses = existingData.licenses;
                 data.roles = existingData.roles;
             }
