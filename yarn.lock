@@ -1553,7 +1553,21 @@ douhub-helper-util@1.0.64:
     slugify "^1.6.4"
     uuid "^8.3.2"
 
-douhub-helper-util@1.0.70, douhub-helper-util@^1.0.70:
+douhub-helper-util@1.0.72:
+  version "1.0.72"
+  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.72.tgz#05b55ec89406609e653220bc38d60bce0146c6be"
+  integrity sha512-56YjgpvkpaBU9QRcCN4BnmkQ8v2IO12bid7DXI5iLZ9oO4LLiNr7s9seX6a53nNhfH48bxxuGtBd6YkxBl6uGA==
+  dependencies:
+    axios "^0.24.0"
+    csvtojson "^2.0.10"
+    is-url "^1.2.4"
+    js-base64 "^3.7.2"
+    libphonenumber-js "^1.9.42"
+    lodash "^4.17.21"
+    slugify "^1.6.4"
+    uuid "^8.3.2"
+
+douhub-helper-util@^1.0.70:
   version "1.0.70"
   resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.70.tgz#1a94fcb4d7727c0d31a112473339e4cc712f3bff"
   integrity sha512-MiuLtGCP3eQgB/5GtN6DW2O80tLzUM9kzQ4f97s0c/GbBtMzyzWpbvbdX+2D0klQmk4oQelOBTtKOZoitxx/9Q==

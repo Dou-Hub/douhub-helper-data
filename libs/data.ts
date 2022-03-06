@@ -20,12 +20,12 @@ import { cosmosDBQuery, cosmosDBUpsert, cosmosDBDelete, cosmosDBRetrieve } from 
 const DEFAULT_USER_ATTRS = 'id,avatar,firstName,lastName,title,company,introduction,media,url,twitter,icon';
 const DEFAULT_LOOKUP_ATTRS = 'id,avatar,firstName,lastName,fullName,name,url,title,subject,display,text,media,twitter,icon';
 
-export const retrieveRecord = async (context: Record<string, any>, ids: string[], attributes: string[], skipSecurityCheck: boolean, query?: Record<string, any>): Promise<Record<string, any> | Array<Record<string, any>> | null> => {
+export const retrieveRecord = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Record<string, any> | Array<Record<string, any>> | null> => {
     return await retrieveBase(context, ids, attributes, skipSecurityCheck, query);
 };
 
 //retrieve one or multiple records
-export const retrieveBase = async (context: Record<string, any>, ids: string[], attributes: string[], skipSecurityCheck: boolean, query?: Record<string, any>): Promise<Record<string, any> | Array<Record<string, any>> | null> => {
+export const retrieveBase = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Record<string, any> | Array<Record<string, any>> | null> => {
 
     if (!query) query = {}
     query.ids = ids;
@@ -69,7 +69,7 @@ export const retrieveBase = async (context: Record<string, any>, ids: string[], 
 };
 
 
-export const queryRecords = async (context: Record<string, any>, query: Record<string, any>, skipSecurityCheck: boolean): Promise<Record<string, any>> => {
+export const queryRecords = async (context: Record<string, any>, query: Record<string, any>, skipSecurityCheck?: boolean): Promise<Record<string, any>> => {
     return await queryBase(context, query, skipSecurityCheck);
 };
 
@@ -85,7 +85,7 @@ export const queryRecords = async (context: Record<string, any>, query: Record<s
         ]
     });
 */
-export const queryBase = async (context: Record<string, any>, query: Record<string, any>, skipSecurityCheck: boolean): Promise<Record<string, any>> => {
+export const queryBase = async (context: Record<string, any>, query: Record<string, any>, skipSecurityCheck?: boolean): Promise<Record<string, any>> => {
 
     //Process the query and transform the query to the CosmosDb format
     query = processQuery(context, query, skipSecurityCheck);
