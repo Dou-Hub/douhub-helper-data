@@ -17,9 +17,6 @@ export {
     handleCategoryConditions,
     handleCategoryConditionsBase,
     handleTagConditions,
-    handleSecurityConditions,
-    handleSecurityCondition_Scope,
-    // handleSolutionConditions,
     handleScopeCondition,
     handleIdCondition,
     handleIdsCondition,
@@ -37,7 +34,7 @@ export {
 
 
 export {
-    checkDuplication, retrieveRecord, 
+    checkDuplication, retrieveRecordById, retrieveRecordByIds,
     queryRecords, retrieveRelatedRecords, createRecord, 
     deleteRecord, upsertRecord, partialUpdateRecord, 
     updateRecord, processUpsertData, UpsertSettings

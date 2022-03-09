@@ -20,12 +20,17 @@ import { cosmosDBQuery, cosmosDBUpsert, cosmosDBDelete, cosmosDBRetrieve } from 
 const DEFAULT_USER_ATTRS = 'id,avatar,firstName,lastName,title,company,introduction,media,url,twitter,icon';
 const DEFAULT_LOOKUP_ATTRS = 'id,avatar,firstName,lastName,fullName,name,url,title,subject,display,text,media,twitter,icon';
 
-export const retrieveRecord = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Record<string, any> | Array<Record<string, any>> | null> => {
+export const retrieveRecordById = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Record<string, any>|null> => {
+    const records = await retrieveBase(context, ids, attributes, skipSecurityCheck, query);
+    return records.length>=0?records[0]:null;
+};
+
+export const retrieveRecordByIds = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Array<Record<string, any>>> => {
     return await retrieveBase(context, ids, attributes, skipSecurityCheck, query);
 };
 
 //retrieve one or multiple records
-export const retrieveBase = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Record<string, any> | Array<Record<string, any>> | null> => {
+export const retrieveBase = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Array<Record<string, any>> > => {
 
     if (!query) query = {}
     query.ids = ids;
@@ -57,14 +62,7 @@ export const retrieveBase = async (context: Record<string, any>, ids: string[], 
         }), null);
     }
 
-    result.count == result.data.length;
-
-    if (result.count == 0) {
-        return isArray(ids) ? [] : null;
-    }
-    else {
-        return isArray(ids) ? result.data : result.data[0];
-    }
+    return result.data;
 
 };
 
@@ -230,7 +228,7 @@ export const retrieveRelatedRecordsBase = async (
     if (ids.length > 0) {
         //retrieve all owner records
         const list: Record<string, any> = {};
-        each(await retrieveRecord(context, ids.split(','), resultFieldNames, true), (r) => {
+        each(await retrieveRecordByIds(context, ids.split(','), resultFieldNames, true), (r) => {
             list[r.id] = r;
         });
 

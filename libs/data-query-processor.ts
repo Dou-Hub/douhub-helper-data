@@ -3,7 +3,7 @@
 //  This source code is licensed under the MIT license.
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
-import { isString, isArray, unionBy, isNumber, each, isNil } from 'lodash';
+import { isString, isArray, unionBy, isNumber, each, isNil, isInteger } from 'lodash';
 import { isObject, newGuid, isNonEmptyString, _track, checkEntityPrivilege } from 'douhub-helper-util';
 import { HTTPERROR_403 } from 'douhub-helper-lambda';
 
@@ -66,7 +66,7 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
         { name: `@solutionId`, value: solution.id }
     ];
 
-    req.query = `SELECT ${req.attributes} FROM c WHERE `;
+    req.query = `SELECT ${isInteger(req.top)?`TOP ${req.top}`:''} ${req.attributes} FROM c WHERE `;
 
     req = handleIdCondition(req);
     req = handleIdsCondition(req);
@@ -77,14 +77,12 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
     if (isNonEmptyString(req.keywords)) req.conditions.push({ attribute: 'search', op: 'search', value: req.keywords.toLowerCase() });
     if (isNonEmptyString(req.ownedBy)) req.conditions.push({ attribute: 'ownedBy', op: '=', value: req.ownedBy });
     if (isNonEmptyString(req.regardingId)) req.conditions.push({ attribute: 'regardingId', op: '=', value: req.regardingId });
-
+   
     // req = handleSolutionConditions(req);
 
     req = handleCategoryConditions(req);
     req = handleTagConditions(req);
-    req = handleScopeCondition(req);
-
-    if (!skipSecurityCheck) req = handleSecurityConditions(req);
+    req = handleScopeCondition(context, req, skipSecurityCheck);
 
     req = groupConditions(req);
     req = handleOrderBy(req);
@@ -191,6 +189,7 @@ export const handleCategoryConditionsBase = (req:Record<string,any>, categoryIds
     return req;
 };
 
+
 export const handleTagConditions = (req:Record<string,any>):Record<string,any> => {
     const tags = req.tags;
     if (!isArray(tags) || isArray(tags) && tags.length == 0) return req;
@@ -213,47 +212,7 @@ export const handleTagConditions = (req:Record<string,any>):Record<string,any> =
     return req;
 };
 
-export const handleSecurityConditions = (req:Record<string,any>):Record<string,any> => {
-    req = handleSecurityCondition_Scope(req);
-    return req;
-};
-
-export const handleSecurityCondition_Scope = (req:Record<string,any>):Record<string,any> => {
-
-    if (req.entityName == 'Secret') return req;
-
-    req.scope = isNonEmptyString(req.scope) ? req.scope : 'organization';
-    switch (req.scope.toLowerCase()) {
-        case 'global':
-        case 'mine':
-        case 'global-and-mine':
-            {
-                //has been handled by handleScopeCondition function
-                break;
-            }
-        default: // 'organization':
-            {
-                req.conditions.push('c.organizationId = @organizationId');
-                break;
-            }
-    }
-
-    return req;
-};
-
-// export const handleSolutionConditions = (req:Record<string,any>):Record<string,any> => {
-
-//     if (
-//         req.entityName == 'SolutionDashboard' ||
-//         req.entityName == 'Site' ||
-//         req.entityName == 'Localization' ||
-//         req.entityName == 'SolutionDefinition') {
-//         req.conditions.push('c.ownerId = @solutionId');
-//     }
-//     return req;
-// };
-
-export const handleScopeCondition = (req:Record<string,any>):Record<string,any> => {
+export const handleScopeCondition = (context:Record<string,any>, req:Record<string,any>, skipSecurityCheck?:boolean):Record<string,any> => {
 
     req.scope = isNonEmptyString(req.scope) ? req.scope.toLowerCase() : '';
 
@@ -270,16 +229,17 @@ export const handleScopeCondition = (req:Record<string,any>):Record<string,any> 
             }
         case 'global-and-mine':
             {
-                req.conditions.push('c.ownedBy=@userId or c.isGlobal and c.ownedBy!=@userId');
+                req.conditions.push('c.ownedBy=@userId OR c.isGlobal and c.ownedBy!=@userId');
                 break;
             }
-        case 'organization':
+        case 'membership':
             {
-                req.conditions.push('c.organizationId = @organizationId');
+                req.conditions.push(`c.organizationId = @organizationId AND (c.ownedBy=@userId OR IS_DEFINED(c.membership) AND IS_DEFINED(c.membership["${context.userId}"]))`);
                 break;
             }
         default:
             {
+                req.conditions.push('c.organizationId = @organizationId');
                 break;
             }
     }
