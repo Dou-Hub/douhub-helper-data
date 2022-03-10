@@ -66,7 +66,7 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
         { name: `@solutionId`, value: solution.id }
     ];
 
-    req.query = `SELECT ${isInteger(req.top)?`TOP ${req.top}`:''} ${req.attributes} FROM c WHERE `;
+    req.query = `SELECT ${isInteger(req.top) ? `TOP ${req.top}` : ''} ${req.attributes} FROM c WHERE `;
 
     req = handleIdCondition(req);
     req = handleIdsCondition(req);
@@ -77,12 +77,12 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
     if (isNonEmptyString(req.keywords)) req.conditions.push({ attribute: 'search', op: 'search', value: req.keywords.toLowerCase() });
     if (isNonEmptyString(req.ownedBy)) req.conditions.push({ attribute: 'ownedBy', op: '=', value: req.ownedBy });
     if (isNonEmptyString(req.regardingId)) req.conditions.push({ attribute: 'regardingId', op: '=', value: req.regardingId });
-   
+
     // req = handleSolutionConditions(req);
 
     req = handleCategoryConditions(req);
     req = handleTagConditions(req);
-    req = handleScopeCondition(context, req, skipSecurityCheck);
+    req = handleScopeCondition(req);
 
     req = groupConditions(req);
     req = handleOrderBy(req);
@@ -92,7 +92,7 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
     return req;
 };
 
-export const groupConditions = (req:Record<string,any>):Record<string,any> => {
+export const groupConditions = (req: Record<string, any>): Record<string, any> => {
 
     for (var i = 0; i < req.conditions.length; i++) {
         //conditions can be object or string
@@ -113,17 +113,23 @@ export const groupConditions = (req:Record<string,any>):Record<string,any> => {
                         }
                     case 'ARRAY_CONTAINS':
                         {
-                            req.conditions[i] = `${op}(${attribute}, ${paramName})`;
+                            req.conditions[i] = `ARRAY_CONTAINS(${attribute}, ${paramName})`;
                             break;
                         }
+                    case 'NOT_ARRAY_CONTAINS':
+                        {
+                            req.conditions[i] = `NOT ARRAY_CONTAINS(${attribute}, ${paramName})`;
+                            break;
+                        }
+                    case 'NOT_IN':
                     case 'IN':
                         {
                             if (isArray(req.paramValues) && req.paramValues.length > 0) {
                                 let condition = '';
-                        
+
                                 for (var i = 0; i < req.ids.length; i++) {
                                     if (i == 0) {
-                                        condition = `${attribute} IN (${paramName}${i}`;
+                                        condition = `${attribute} ${op == 'NOT_IN' ? 'NOT IN' : 'IN'} (${paramName}${i}`;
                                     }
                                     else {
                                         condition = `${condition} ,${paramName}${i}`;
@@ -131,14 +137,29 @@ export const groupConditions = (req:Record<string,any>):Record<string,any> => {
                                     if (i == req.paramValues.length - 1) condition = `${condition})`;
                                     req.parameters.push({ name: `${paramName}${i}`, value: req.paramValues[i] });
                                 }
-                        
+
                                 req.conditions[i] = condition;
                             }
                             break;
                         }
+                    case 'NOT_CONTAINS':
+                        {
+                            req.conditions[i] = `NOT CONTAINS(${attribute}, ${paramName})`;
+                            break;
+                        }
                     case 'CONTAINS':
                         {
-                            req.conditions[i] = `${op}(${attribute}, ${paramName})`;
+                            req.conditions[i] = `CONTAINS(${attribute}, ${paramName})`;
+                            break;
+                        }
+                    case 'NOT_IS_DEFINED':
+                        {
+                            req.conditions[i] = `NOT IS_DEFINED(${attribute})`;
+                            break;
+                        }
+                    case 'IS_DEFINED':
+                        {
+                            req.conditions[i] = `IS_DEFINED(${attribute})`;
                             break;
                         }
                     default:
@@ -158,13 +179,13 @@ export const groupConditions = (req:Record<string,any>):Record<string,any> => {
     return req;
 };
 
-export const handleCategoryConditions = (req:Record<string,any>):Record<string,any> => {
+export const handleCategoryConditions = (req: Record<string, any>): Record<string, any> => {
     req = handleCategoryConditionsBase(req, 'categoryIds');
     req = handleCategoryConditionsBase(req, 'globalCategoryIds');
     return req;
 };
 
-export const handleCategoryConditionsBase = (req:Record<string,any>, categoryIdsFieldName: string):Record<string,any> => {
+export const handleCategoryConditionsBase = (req: Record<string, any>, categoryIdsFieldName: string): Record<string, any> => {
 
     const categoryIds = req[categoryIdsFieldName];
     if (!isArray(categoryIds) || isArray(categoryIds) && categoryIds.length == 0) return req;
@@ -190,7 +211,7 @@ export const handleCategoryConditionsBase = (req:Record<string,any>, categoryIds
 };
 
 
-export const handleTagConditions = (req:Record<string,any>):Record<string,any> => {
+export const handleTagConditions = (req: Record<string, any>): Record<string, any> => {
     const tags = req.tags;
     if (!isArray(tags) || isArray(tags) && tags.length == 0) return req;
 
@@ -212,7 +233,7 @@ export const handleTagConditions = (req:Record<string,any>):Record<string,any> =
     return req;
 };
 
-export const handleScopeCondition = (context:Record<string,any>, req:Record<string,any>, skipSecurityCheck?:boolean):Record<string,any> => {
+export const handleScopeCondition = (req: Record<string, any>): Record<string, any> => {
 
     req.scope = isNonEmptyString(req.scope) ? req.scope.toLowerCase() : '';
 
@@ -234,7 +255,13 @@ export const handleScopeCondition = (context:Record<string,any>, req:Record<stri
             }
         case 'membership':
             {
-                req.conditions.push(`c.organizationId = @organizationId AND (c.ownedBy=@userId OR IS_DEFINED(c.membership) AND IS_DEFINED(c.membership["${context.userId}"]))`);
+                if (isNonEmptyString(req.recordIdForMembership)) {
+                    req.conditions.push(`c.organizationId = @organizationId AND IS_DEFINED(c.membership) AND IS_DEFINED(c.membership["${req.recordIdForMembership}"])`);
+                }
+                else {
+                    req.conditions.push('c.organizationId = @organizationId');
+                }
+
                 break;
             }
         default:
@@ -326,7 +353,7 @@ export const handleAttributes = (req: Record<string, any>): Record<string, any> 
     return req;
 };
 
-export const handleOrderBy = (req:Record<string,any>) :Record<string,any>=> {
+export const handleOrderBy = (req: Record<string, any>): Record<string, any> => {
 
     if (isNonEmptyString(req.orderBy)) {
         const orderByInfo = req.orderBy.replace(/,/g, ' ').replace(/[ ]{2,}/gi, ' ').trim().split(' ');

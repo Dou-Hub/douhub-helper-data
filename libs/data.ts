@@ -126,11 +126,11 @@ export const queryRaw = async (context: Record<string, any>, query: Record<strin
     delete query.pageSize;
     delete query.ignorePage;
 
+    if (_track) console.log({ query: JSON.stringify(query.query), parameters: JSON.stringify(query.parameters)});
+
     const response = (await cosmosDBQuery(query.query, query.parameters, { includeAzureInfo: true }));
     const results = response.resources;
-
-    // if (_track) console.log({ queryRaw: JSON.stringify(results) });
-
+    
     //In some cases we will have to retrieve more data
     let data = await retrieveRelatedRecords(context, query, results);
 
