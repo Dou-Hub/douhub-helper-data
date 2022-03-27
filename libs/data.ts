@@ -3,38 +3,44 @@
 //  This source code is licensed under the MIT license.
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
-import { isString, map, assign, isNil, isArray, without, isNumber, each, endsWith, cloneDeep } from 'lodash';
+import { isString, map, isNil, isArray, without, isNumber, each, endsWith, cloneDeep } from 'lodash';
 import {
     isObject, newGuid, isNonEmptyString, _track,
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
     utcISOString, getEntity, getRecordFullName,
     checkEntityPrivilege, checkRecordPrivilege
 } from 'douhub-helper-util';
-import { HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING, ERROR_PARAMETER_INVALID, ERROR_AUTH_FAILED, ERROR_PERMISSION_DENIED } from 'douhub-helper-lambda';
+import {
+    HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING,
+    ERROR_PARAMETER_INVALID, checkRecordToken, ERROR_PERMISSION_DENIED
+} from 'douhub-helper-lambda';
 
 import { processQuery } from './data-query-processor';
 import { processResult } from './data-result-processor';
 import { cleanHTML, getBaseDomain } from './data-web';
-import { cosmosDBQuery, cosmosDBUpsert, cosmosDBDelete, cosmosDBRetrieve } from 'douhub-helper-service';
+import { cosmosDBQuery, cosmosDBUpsert, cosmosDBDelete, cosmosDBRetrieveById, cosmosDBQueryWithAzureInfo, DEFAULT_USER_ATTRIBUTES, DEFAULT_LOOKUP_ATTRIBUTES } from 'douhub-helper-service';
 
-const DEFAULT_USER_ATTRS = 'id,avatar,firstName,lastName,title,company,introduction,media,url,twitter,icon';
-const DEFAULT_LOOKUP_ATTRS = 'id,avatar,firstName,lastName,fullName,name,url,title,subject,display,text,media,twitter,icon';
 
-export const retrieveRecordById = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Record<string, any>|null> => {
-    const records = await retrieveBase(context, ids, attributes, skipSecurityCheck, query);
-    return records.length>=0?records[0]:null;
+export const retrieveRecordByToken = async (token: string, settings?: { attributes?: string }): Promise<Record<string, any> | null> => {
+    return await checkRecordToken(token, settings);
 };
 
-export const retrieveRecordByIds = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Array<Record<string, any>>> => {
-    return await retrieveBase(context, ids, attributes, skipSecurityCheck, query);
+export const retrieveRecordById = async (context: Record<string, any>, id: string, settings?: { attributes?: string[], skipSecurityCheck?: boolean }): Promise<Record<string, any> | null> => {
+    const records = await retrieveBase(context, [id], settings);
+    return records.length >= 0 ? records[0] : null;
+};
+
+export const retrieveRecordByIds = async (context: Record<string, any>, ids: string[], settings?: { attributes?: string[], skipSecurityCheck?: boolean }): Promise<Array<Record<string, any>>> => {
+    return await retrieveBase(context, ids, settings);
 };
 
 //retrieve one or multiple records
-export const retrieveBase = async (context: Record<string, any>, ids: string[], attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any>): Promise<Array<Record<string, any>> > => {
+export const retrieveBase = async (context: Record<string, any>, ids: string[], settings?: { attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any> }): Promise<Array<Record<string, any>>> => {
 
-    if (!query) query = {}
+    if (!isObject(settings)) settings = {};
+    const query = settings?.query ? settings.query : {}
     query.ids = ids;
-    query.attributes = attributes;
+    query.attributes = settings?.attributes;
     query.ignorePage = true;
 
     if (_track) console.log('retrieveBase', query);
@@ -47,10 +53,10 @@ export const retrieveBase = async (context: Record<string, any>, ids: string[], 
 
     //Then we will check security based on the result, because result will has entityName, entityType, organizationId, 
     //Result has more attrs for security check
-    if (!skipSecurityCheck && result.data.length > 0) {
+    if (!settings?.skipSecurityCheck && result.data.length > 0) {
 
         result.data = without(map(result.data, (data) => {
-            if (data.isGlobal || skipSecurityCheck) return data;
+            if (data.isGlobal || settings?.skipSecurityCheck) return data;
 
             //check privilege, lookup request will not check privilege. the returned data properties are limited in cosmos-db-query-processor.js
             if (query?.lookup != true && !checkRecordPrivilege(context, data, "read")) {
@@ -71,18 +77,6 @@ export const queryRecords = async (context: Record<string, any>, query: Record<s
     return await queryBase(context, query, skipSecurityCheck);
 };
 
-/*
-    const data = await cosmosDb.query(context, 
-    {
-        query: "SELECT top 1 * FROM c WHERE  c.id = @id",
-        parameters: [
-        {
-            name: "@id",
-            value: "ad4d5afc-b92a-48a0-895f-67c9faf27363"
-        }
-        ]
-    });
-*/
 export const queryBase = async (context: Record<string, any>, query: Record<string, any>, skipSecurityCheck?: boolean): Promise<Record<string, any>> => {
 
     //Process the query and transform the query to the CosmosDb format
@@ -126,11 +120,11 @@ export const queryRaw = async (context: Record<string, any>, query: Record<strin
     delete query.pageSize;
     delete query.ignorePage;
 
-    if (_track) console.log({ query: JSON.stringify(query.query), parameters: JSON.stringify(query.parameters)});
+    if (_track) console.log({ query: JSON.stringify(query.query), parameters: JSON.stringify(query.parameters) });
 
-    const response = (await cosmosDBQuery(query.query, query.parameters, { includeAzureInfo: true }));
+    const response = await cosmosDBQueryWithAzureInfo(query.query, query.parameters);
     const results = response.resources;
-    
+
     //In some cases we will have to retrieve more data
     let data = await retrieveRelatedRecords(context, query, results);
 
@@ -161,7 +155,7 @@ export const retrieveRelatedRecords = async (context: Record<string, any>, query
 
     if (query.includeOwnerInfo) {
 
-        let ownerAttrs = DEFAULT_USER_ATTRS;
+        let ownerAttrs = DEFAULT_USER_ATTRIBUTES;
         //includeOwnerInfo may be a list of attributes for the user records
         if (isString(query.includeOwnerInfo) && query.includeOwnerInfo.length > 0 && query.includeOwnerInfo != 'true') {
             ownerAttrs = query.includeOwnerInfo;
@@ -183,7 +177,7 @@ export const retrieveRelatedRecords = async (context: Record<string, any>, query
 
     if (query.includeUserInfo) {
 
-        let userAttrs = DEFAULT_USER_ATTRS;
+        let userAttrs = DEFAULT_USER_ATTRIBUTES;
         //includeUserInfo may be a list of attributes for the user records
         if (isString(query.includeUserInfo) && query.includeUserInfo.length > 0) {
             userAttrs = query.includeUserInfo;
@@ -197,7 +191,7 @@ export const retrieveRelatedRecords = async (context: Record<string, any>, query
 
         for (var i = 0; i < includeLookups.length; i++) {
             if (isNonEmptyString(includeLookups[i].fieldName)) {
-                let lookupAttrs = isNonEmptyString(includeLookups[i].attributes) ? includeLookups[i].attributes : DEFAULT_LOOKUP_ATTRS;
+                let lookupAttrs = isNonEmptyString(includeLookups[i].attributes) ? includeLookups[i].attributes : DEFAULT_LOOKUP_ATTRIBUTES;
                 data = await retrieveRelatedRecordsBase(context, includeLookups[i].fieldName, lookupAttrs.split(','), `${includeLookups[i].fieldName}_info`, data);
             }
         }
@@ -228,7 +222,10 @@ export const retrieveRelatedRecordsBase = async (
     if (ids.length > 0) {
         //retrieve all owner records
         const list: Record<string, any> = {};
-        each(await retrieveRecordByIds(context, ids.split(','), resultFieldNames, true), (r) => {
+        each(await retrieveRecordByIds(context, ids.split(','), {
+            attributes: resultFieldNames,
+            skipSecurityCheck: true,
+        }), (r) => {
             list[r.id] = r;
         });
 
@@ -247,7 +244,7 @@ export type UpsertSettings = {
     skipDuplicationCheck?: boolean,
     updateOnly?: boolean,
     skipSecurityCheck?: boolean,
-    skipSystemPropertyCheck?:boolean
+    skipSystemPropertyCheck?: boolean
 }
 
 export const createRecord = async (context: Record<string, any>, record: Record<string, any>, settings?: UpsertSettings): Promise<Record<string, any>> => {
@@ -265,9 +262,8 @@ export const createRecord = async (context: Record<string, any>, record: Record<
             }
         }
     }
-    
-    if (!isNonEmptyString(record.entityName))
-    {
+
+    if (!isNonEmptyString(record.entityName)) {
         throw {
             ...HTTPERROR_403,
             type: ERROR_PARAMETER_MISSING,
@@ -286,13 +282,13 @@ export const createRecord = async (context: Record<string, any>, record: Record<
 
     if (!isObject(settings)) settings = {};
     const skipSecurityCheck = settings?.skipSecurityCheck == true;
-   
+
     data.createdBy = userId;
     data.createdOn = utcNow;
     data.ownedBy = userId;
     data.ownedOn = utcNow;
 
-    
+
 
     if (!skipSecurityCheck) {
         const entityType = data.entityType;
@@ -314,7 +310,7 @@ export const deleteRecord = async (context: Record<string, any>, id: string, set
 
     if (!isNonEmptyString(id)) throw HTTPERROR_403;
     if (!isObject(settings)) settings = {};
-    const record = await cosmosDBRetrieve(id);
+    const record = await cosmosDBRetrieveById(id);
     return record ? await deleteRecordBase(context, record, settings) : undefined;
 };
 
@@ -375,8 +371,7 @@ export const updateRecord = async (context: Record<string, any>, record: Record<
         }
     }
 
-    if (!isNonEmptyString(record.entityName))
-    {
+    if (!isNonEmptyString(record.entityName)) {
         throw {
             ...HTTPERROR_403,
             type: ERROR_PARAMETER_MISSING,
@@ -427,7 +422,7 @@ export const partialUpdateRecord = async (context: Record<string, any>, record: 
 
 
     //we will have to get the record first
-    const existingRecord = cosmosDBRetrieve(record.id);
+    const existingRecord = cosmosDBRetrieveById(record.id);
 
     if (!existingRecord) {
         throw {
@@ -462,7 +457,7 @@ export const upsertRecord = async (context: Record<string, any>, record: Record<
     const skipSecurityCheck = settings?.skipSecurityCheck == true;
     const skipSystemPropertyCheck = settings?.skipSystemPropertyCheck == true;
     const skipDuplicationCheck = settings?.skipDuplicationCheck == true;
-    
+
 
     if (!skipSecurityCheck && (data.id && !checkRecordPrivilege(context, data, 'update') || !data.id && !checkRecordPrivilege(context, data, 'create'))) {
         throw HTTPERROR_403;
@@ -564,15 +559,11 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
         case 'Organization':
             {
                 data.organizationId = data.id;
-                //if (isObject(cx.secret.encryptionFeed) && !isNonEmptyString(data.token)) data.token = _.encrypt(`${data.id}.${_.utcMaxISOString().split('.')[0]}.${newGuid()}`, cx.secret.encryptionFeed.key, cx.secret.encryptionFeed.iv);
-                //data.token = await _.createRecordToken(cx, data);
                 break;
             }
         default:
             {
                 data.organizationId = context.organizationId || user.organizationId;
-                //if (isObject(cx.secret.encryptionFeed) && !isNonEmptyString(data.token)) data.token = _.encrypt(`${data.id}.${_.utcMaxISOString().split('.')[0]}.${newGuid()}`, cx.secret.encryptionFeed.key, cx.secret.encryptionFeed.iv);
-                //data.token = await _.createRecordToken(cx, data);
                 break;
             }
     }
@@ -604,9 +595,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     data.display = getRecordDisplay(data);
     data.abstract = getRecordAbstract(data);
 
-    if (data.isGlobal && !data.isGlobalOn) data.isGlobalOn = utcISOString();
-    data.isGlobalOrderBy = data.isGlobalOn ? data.isGlobalOn : data.createdOn;
-
+  
     let tags = data.tags;
 
     if (isNonEmptyString(tags)) tags = tags.split(',');
@@ -668,7 +657,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
 
     if (!isNew && !skipExistingData) {
 
-        const existingData: any = await cosmosDBRetrieve(data.id);
+        const existingData: any = await cosmosDBRetrieveById(data.id);
 
         if (existingData) {
 
@@ -693,6 +682,30 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
                 data.licenses = existingData.licenses;
                 data.roles = existingData.roles;
             }
+
+            if (existingData.isGlobal!=true && data.isGlobal==true)
+            {
+                data.isGlobalOn = utcISOString();
+                data.isGlobalBy = user.id;
+            }
+
+            if (existingData.isGlobal==true && data.isGlobal!=true)
+            {
+                delete data.isGlobalOn;
+                delete data.isGlobalBy;
+            }
+
+            if (existingData.isPublished!=true && data.isPublished==true)
+            {
+                data.publishedOn = utcISOString();
+                data.publishedBy = user.id;
+            }
+
+            if (existingData.isPublished==true && data.isPublished!=true)
+            {
+                delete data.isPublishedOn;
+                delete data.isPublishedBy;
+            }
         }
         else {
             if (updateOnly) {
@@ -709,6 +722,19 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
         }
 
     }
+
+    if (data.isGlobal==true)
+    {
+        if (!data.isGlobalOn) data.isGlobalOn = utcISOString();
+        if (!data.isGlobalBy) data.isGlobalBy =  user.id;
+        data.isGlobalOrderBy = data.isGlobalOn ? data.isGlobalOn : data.createdOn;
+    } 
+    
+    if (data.isPublished==true)
+    {
+        if (!data.publishedOn) data.publishedOn = utcISOString();
+        if (!data.publishedBy) data.publishedBy =  user.id;
+    } 
 
     if (!skipDuplicationCheck) {
         const checkDuplicationResult = await checkDuplication(data, isNew);

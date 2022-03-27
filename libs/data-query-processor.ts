@@ -6,8 +6,7 @@
 import { isString, isArray, unionBy, isNumber, each, isNil, isInteger } from 'lodash';
 import { isObject, newGuid, isNonEmptyString, _track, checkEntityPrivilege } from 'douhub-helper-util';
 import { HTTPERROR_403 } from 'douhub-helper-lambda';
-
-export const DEFAULT_LOOKUP_ATTRIBUTES = 'id,avatar,firstName,lastName,fullName,name,title,display,text';
+import { DEFAULT_LOOKUP_ATTRIBUTES } from 'douhub-helper-service';
 
 // !!!!!!!!!!!!!!!!!!
 // If you change logic here for cosmosDB query, please remember to make same change to elastic-search-query-processor.js

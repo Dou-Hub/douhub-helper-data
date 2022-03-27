@@ -11,7 +11,6 @@ import { TAGS_NAMES} from './libs/data/tags/tags-names';
 
 
 export {
-    DEFAULT_LOOKUP_ATTRIBUTES,
     processQuery,
     groupConditions,
     handleCategoryConditions,
@@ -37,6 +36,7 @@ export {
     checkDuplication, retrieveRecordById, retrieveRecordByIds,
     queryRecords, retrieveRelatedRecords, createRecord, 
     deleteRecord, upsertRecord, partialUpdateRecord, 
+    retrieveRecordByToken,
     updateRecord, processUpsertData, UpsertSettings
 } from './libs/data';
 
