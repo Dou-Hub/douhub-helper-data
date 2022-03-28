@@ -34,9 +34,9 @@ export {
 
 export {
     checkDuplication, retrieveRecordById, retrieveRecordByIds,
-    queryRecords, retrieveRelatedRecords, createRecord, 
+    queryRecords, retrieveRelatedRecords, createRecord, retrieveRelatedRecordsBase,
     deleteRecord, upsertRecord, partialUpdateRecord, 
-    retrieveRecordByToken,
+    retrieveRecordByToken, retrieveRelatedRecordsCache, insertRelatedRecordsCache,
     updateRecord, processUpsertData, UpsertSettings
 } from './libs/data';
 

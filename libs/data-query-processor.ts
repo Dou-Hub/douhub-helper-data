@@ -62,7 +62,7 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
     req.parameters = [
         { name: `@organizationId`, value: context.organizationId },
         { name: `@userId`, value: context.userId },
-        { name: `@solutionId`, value: solution.id }
+        { name: `@solutionId`, value: context.solutionId }
     ];
 
     req.query = `SELECT ${isInteger(req.top) ? `TOP ${req.top}` : ''} ${req.attributes} FROM c WHERE `;
@@ -245,6 +245,11 @@ export const handleScopeCondition = (req: Record<string, any>): Record<string, a
         case 'mine':
             {
                 req.conditions.push('c.ownedBy=@userId');
+                break;
+            }
+        case 'global-or-organization':
+            {
+                req.conditions.push('c.isGlobal OR c.organizationId = @organizationId');
                 break;
             }
         case 'global-and-mine':

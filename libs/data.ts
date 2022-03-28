@@ -5,10 +5,10 @@
 
 import { isString, map, isNil, isArray, without, isNumber, each, endsWith, cloneDeep } from 'lodash';
 import {
-    isObject, newGuid, isNonEmptyString, _track,
+    isObject, newGuid, isNonEmptyString, _track, _process,
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
     utcISOString, getEntity, getRecordFullName,
-    checkEntityPrivilege, checkRecordPrivilege
+    checkEntityPrivilege, checkRecordPrivilege, doNothing
 } from 'douhub-helper-util';
 import {
     HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING,
@@ -20,22 +20,37 @@ import { processResult } from './data-result-processor';
 import { cleanHTML, getBaseDomain } from './data-web';
 import { cosmosDBQuery, cosmosDBUpsert, cosmosDBDelete, cosmosDBRetrieveById, cosmosDBQueryWithAzureInfo, DEFAULT_USER_ATTRIBUTES, DEFAULT_LOOKUP_ATTRIBUTES } from 'douhub-helper-service';
 
+if (!isObject(_process.relatedRecords)) {
+    _process.relatedRecords = {};
+}
 
-export const retrieveRecordByToken = async (token: string, settings?: { attributes?: string }): Promise<Record<string, any> | null> => {
+export const retrieveRecordByToken = async (token: string, settings?: {
+    attributes?: string
+}): Promise<Record<string, any> | null> => {
     return await checkRecordToken(token, settings);
 };
 
-export const retrieveRecordById = async (context: Record<string, any>, id: string, settings?: { attributes?: string[], skipSecurityCheck?: boolean }): Promise<Record<string, any> | null> => {
+export const retrieveRecordById = async (context: Record<string, any>, id: string, settings?: {
+    attributes?: string[],
+    skipSecurityCheck?: boolean
+}): Promise<Record<string, any> | null> => {
     const records = await retrieveBase(context, [id], settings);
     return records.length >= 0 ? records[0] : null;
 };
 
-export const retrieveRecordByIds = async (context: Record<string, any>, ids: string[], settings?: { attributes?: string[], skipSecurityCheck?: boolean }): Promise<Array<Record<string, any>>> => {
+export const retrieveRecordByIds = async (context: Record<string, any>, ids: string[], settings?: {
+    attributes?: string[],
+    skipSecurityCheck?: boolean
+}): Promise<Array<Record<string, any>>> => {
     return await retrieveBase(context, ids, settings);
 };
 
 //retrieve one or multiple records
-export const retrieveBase = async (context: Record<string, any>, ids: string[], settings?: { attributes?: string[], skipSecurityCheck?: boolean, query?: Record<string, any> }): Promise<Array<Record<string, any>>> => {
+export const retrieveBase = async (context: Record<string, any>, ids: string[], settings?: {
+    attributes?: string[],
+    skipSecurityCheck?: boolean,
+    query?: Record<string, any>
+}): Promise<Array<Record<string, any>>> => {
 
     if (!isObject(settings)) settings = {};
     const query = settings?.query ? settings.query : {}
@@ -126,7 +141,7 @@ export const queryRaw = async (context: Record<string, any>, query: Record<strin
     const results = response.resources;
 
     //In some cases we will have to retrieve more data
-    let data = await retrieveRelatedRecords(context, query, results);
+    let data = await retrieveRelatedRecords(query, results);
 
     if (!isArray(data)) data = [];
 
@@ -148,42 +163,43 @@ export const queryRaw = async (context: Record<string, any>, query: Record<strin
 
 };
 
-export const retrieveRelatedRecords = async (context: Record<string, any>, query: Record<string, any>, records: Array<Record<string, any>>): Promise<Array<Record<string, any>>> => {
+export const retrieveRelatedRecords = async (query: Record<string, any>, records: Array<Record<string, any>>): Promise<Array<Record<string, any>>> => {
 
     if (!isArray(records) || isArray(records) && records.length == 0) return [];
     let data = cloneDeep(records);
 
-    if (query.includeOwnerInfo) {
+      if (query.includeOwnedByInfo) {
 
         let ownerAttrs = DEFAULT_USER_ATTRIBUTES;
         //includeOwnerInfo may be a list of attributes for the user records
-        if (isString(query.includeOwnerInfo) && query.includeOwnerInfo.length > 0 && query.includeOwnerInfo != 'true') {
-            ownerAttrs = query.includeOwnerInfo;
+        if (isNonEmptyString(query.includeOwnedByInfo)) {
+            ownerAttrs = query.includeOwnedByInfo;
         }
 
-        data = await retrieveRelatedRecordsBase(context, 'ownedBy', ownerAttrs.split(','), 'owner_info', data);
+        data = await retrieveRelatedRecordsBase('ownedBy', ownerAttrs.split(','), 'ownedBy_info', data);
     }
 
-    if (query.includeOrganizationInfo) {
+
+    if (query.includeOrganizationIdInfo) {
 
         let orgAttrs = 'id,name,introduction';
-        //includeOrganizationInfo may be a list of attributes for the org records
-        if (isString(query.includeOrganizationInfo) && query.includeOrganizationInfo.length > 0) {
-            orgAttrs = query.includeOrganizationInfo;
+        //includeOrganizationIdInfo may be a list of attributes for the org records
+        if (isNonEmptyString(query.includeOrganizationIdInfo)) {
+            orgAttrs = query.includeOrganizationIdInfo;
         }
 
-        data = await retrieveRelatedRecordsBase(context, 'organizationId', orgAttrs.split(','), 'organization_info', data);
+        data = await retrieveRelatedRecordsBase('organizationId', orgAttrs.split(','), 'organizationId_info', data);
     }
 
     if (query.includeUserInfo) {
 
         let userAttrs = DEFAULT_USER_ATTRIBUTES;
         //includeUserInfo may be a list of attributes for the user records
-        if (isString(query.includeUserInfo) && query.includeUserInfo.length > 0) {
-            userAttrs = query.includeUserInfo;
+        if (isNonEmptyString(query.includeUserInfo)) {
+            userAttrs = query.includeOrganizationIdInfo;
         }
 
-        data = await retrieveRelatedRecordsBase(context, 'userId', userAttrs.split(','), 'user_info', data);
+        data = await retrieveRelatedRecordsBase('userId', userAttrs.split(','), 'userId_info', data);
     }
 
     const includeLookups = query.includeLookups;
@@ -192,7 +208,7 @@ export const retrieveRelatedRecords = async (context: Record<string, any>, query
         for (var i = 0; i < includeLookups.length; i++) {
             if (isNonEmptyString(includeLookups[i].fieldName)) {
                 let lookupAttrs = isNonEmptyString(includeLookups[i].attributes) ? includeLookups[i].attributes : DEFAULT_LOOKUP_ATTRIBUTES;
-                data = await retrieveRelatedRecordsBase(context, includeLookups[i].fieldName, lookupAttrs.split(','), `${includeLookups[i].fieldName}_info`, data);
+                data = await retrieveRelatedRecordsBase(includeLookups[i].fieldName, lookupAttrs.split(','), `${includeLookups[i].fieldName}_info`, data);
             }
         }
     }
@@ -200,8 +216,19 @@ export const retrieveRelatedRecords = async (context: Record<string, any>, query
     return data;
 };
 
+export const retrieveRelatedRecordsCache = (id: string): Record<string, any> => {
+    const r = _process.relatedRecords[id];
+    //-10*1000 make sure it is expired earlier so 
+    //retrieveRelatedRecordsCache in the retrieveRelatedRecordsBase will not get null in a sequencial calls 
+    return r && r.ts > Date.now() - 10 * 1000 ? r.record : null;
+}
+
+
+export const insertRelatedRecordsCache = (record: Record<string, any>) => {
+    _process.relatedRecords[record.id] = { record, ts: Date.now() + 60 * 60 * 1000 }; //expire in 1 hr
+}
+
 export const retrieveRelatedRecordsBase = async (
-    context: Record<string, any>,
     idFieldName: string,
     resultFieldNames: string[],
     objectFieldName: string,
@@ -210,29 +237,42 @@ export const retrieveRelatedRecordsBase = async (
     if (!isArray(records) || isArray(records) && records.length == 0) return [];
     let data = cloneDeep(records);
 
+
     //we need get all ids 
-    let ids = '';
+    let ids:any = '';
     each(data, (r) => {
         const id = r[idFieldName];
-        if (isNonEmptyString(id) && ids.indexOf(id) < 0) {
+        if (isNonEmptyString(id) && isNil(retrieveRelatedRecordsCache(id)) && ids.indexOf(id) < 0) {
             ids = ids.length == 0 ? `${id}` : `${ids},${id}`;
         }
     });
 
     if (ids.length > 0) {
         //retrieve all owner records
-        const list: Record<string, any> = {};
-        each(await retrieveRecordByIds(context, ids.split(','), {
-            attributes: resultFieldNames,
-            skipSecurityCheck: true,
-        }), (r) => {
-            list[r.id] = r;
-        });
+        let queryStatement = `SELECT ${map(resultFieldNames, (resultFieldName: string) => `c.${resultFieldName}`).join(',')} FROM c WHERE c.id IN `;
+        const queryParams: { name: string, value: any }[] = [];
+        ids = ids.split(',');
+        each(ids, (id: string, i: number) => {
+            
+            queryStatement = `${queryStatement} ${i == 0 ? '(' : ''} @p${i} ${i == ids.length - 1 ? ')' : ','}`;
+            queryParams.push({
+                name: `@p${i}`,
+                value: id
+            })
+        })
 
-        data = each(data, (r) => {
-            r[objectFieldName] = list[r[idFieldName]];
+        if (_track) console.log({ queryStatement, queryParams });
+
+        const records = await cosmosDBQuery(queryStatement, queryParams);
+
+        each(records, (r) => {
+            insertRelatedRecordsCache(r);
         });
     }
+
+    data = each(data, (r) => {
+        r[objectFieldName] = retrieveRelatedRecordsCache(r[idFieldName]);
+    });
 
     return data;
 };
@@ -595,7 +635,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     data.display = getRecordDisplay(data);
     data.abstract = getRecordAbstract(data);
 
-  
+
     let tags = data.tags;
 
     if (isNonEmptyString(tags)) tags = tags.split(',');
@@ -683,26 +723,22 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
                 data.roles = existingData.roles;
             }
 
-            if (existingData.isGlobal!=true && data.isGlobal==true)
-            {
+            if (existingData.isGlobal != true && data.isGlobal == true) {
                 data.isGlobalOn = utcISOString();
                 data.isGlobalBy = user.id;
             }
 
-            if (existingData.isGlobal==true && data.isGlobal!=true)
-            {
+            if (existingData.isGlobal == true && data.isGlobal != true) {
                 delete data.isGlobalOn;
                 delete data.isGlobalBy;
             }
 
-            if (existingData.isPublished!=true && data.isPublished==true)
-            {
+            if (existingData.isPublished != true && data.isPublished == true) {
                 data.publishedOn = utcISOString();
                 data.publishedBy = user.id;
             }
 
-            if (existingData.isPublished==true && data.isPublished!=true)
-            {
+            if (existingData.isPublished == true && data.isPublished != true) {
                 delete data.isPublishedOn;
                 delete data.isPublishedBy;
             }
@@ -723,18 +759,16 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
 
     }
 
-    if (data.isGlobal==true)
-    {
+    if (data.isGlobal == true) {
         if (!data.isGlobalOn) data.isGlobalOn = utcISOString();
-        if (!data.isGlobalBy) data.isGlobalBy =  user.id;
+        if (!data.isGlobalBy) data.isGlobalBy = user.id;
         data.isGlobalOrderBy = data.isGlobalOn ? data.isGlobalOn : data.createdOn;
-    } 
-    
-    if (data.isPublished==true)
-    {
+    }
+
+    if (data.isPublished == true) {
         if (!data.publishedOn) data.publishedOn = utcISOString();
-        if (!data.publishedBy) data.publishedBy =  user.id;
-    } 
+        if (!data.publishedBy) data.publishedBy = user.id;
+    }
 
     if (!skipDuplicationCheck) {
         const checkDuplicationResult = await checkDuplication(data, isNew);

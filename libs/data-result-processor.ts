@@ -3,7 +3,7 @@
 //  This source code is licensed under the MIT license.
 //  The detail information can be found in the LICENSE file in the root directory of this source tree.
 
-import { map, isArray, each, find, forOwn,without, isFunction} from 'lodash';
+import { map, isArray, each, find, forOwn,without, isFunction, isNil} from 'lodash';
 import { isObject, _track } from 'douhub-helper-util';
 import {cosmosDBQuery} from 'douhub-helper-service';
 
@@ -73,6 +73,8 @@ export const processAttributeValueText = (context:Record<string,any>, record:Rec
     //console.log('processAttributeValueText-processAttributeValueTextSettings');
 
     const {solution} = context;
+
+    if (isNil(solution)) return { record, context };
 
     context = processAttributeValueTextSettings(context, record.entityName, record.entityType);
 
