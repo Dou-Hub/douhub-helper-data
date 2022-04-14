@@ -225,7 +225,7 @@ export const handleTagConditions = (req: Record<string, any>): Record<string, an
             condition = `${condition} or ARRAY_CONTAINS(c.tagsLowerCase ,@tag${paramId})`;
         }
 
-        req.parameters.push({ name: `@tag${paramId}`, value: tag.toLowerCase() });
+        req.parameters.push({ name: `@tag${paramId}`, value: tag.toLowerCase().trim() });
     }
     req.conditions.push(condition);
 

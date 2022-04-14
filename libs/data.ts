@@ -117,18 +117,18 @@ export const queryRaw = async (context: Record<string, any>, query: Record<strin
     if (query.pageNumber <= 0) query.pageNumber = 1;
     const continuation = (query.pageNumber - 1) * pageSize;
 
-    // if (query.pageSize) {
-
-    query.query = `${query.query} OFFSET @continuation LIMIT @pageSize`;
-    query.parameters.push({
-        name: '@continuation',
-        value: continuation
-    });
-    query.parameters.push({
-        name: '@pageSize',
-        value: pageSize
-    });
-    // }
+     if (!isNumber(query.top))
+    {
+        query.query =  `${query.query} OFFSET @continuation LIMIT @pageSize`;
+        query.parameters.push({
+            name: '@continuation',
+            value: continuation
+        });
+        query.parameters.push({
+            name: '@pageSize',
+            value: pageSize
+        });
+    }
 
     delete query.pageNumber;
     delete query.continuation;
@@ -685,10 +685,10 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
             //     return d.toLowerCase();
             // }) : [];
             // return tag;
-            return tag.text.toLowerCase();
+            return tag.text?.trim()?.toLowerCase();
         }
         else {
-            return tag.toLowerCase();
+            return tag.trim().toLowerCase();
         }
     }) : [];
 
