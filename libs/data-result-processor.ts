@@ -105,7 +105,7 @@ export const processResultWithUserInfo = async (
     let userIds = '';
     let users = {};
     const propName = attributeName ? attributeName : 'ownedBy';
-    let queryStatement = 'SELECT u.id, u.firstName,u.lastName,u.email,u.mobile,u.avatar FROM u WHERE u.entityName=@entityName AND u.id IN (';
+    let queryStatement = 'SELECT u.id,u.firstName,u.lastName,u.email,u.mobile,u.avatar FROM u WHERE u.entityName=@entityName AND u.id IN (';
     let queryParams = [
         {
             name: '@entityName',
@@ -130,7 +130,7 @@ export const processResultWithUserInfo = async (
                 queryParams.push({ name: `${paramName}`, value: userId })
             }
         }
-        return { owner: item[propName], data: item };
+        return { userId: item[propName], data: item };
     }), null);
 
     if (result.length > 0) {
@@ -141,7 +141,7 @@ export const processResultWithUserInfo = async (
     }
 
     return map(result, (r: Record<string, any>) => {
-        r.owner = users[r.owner];
+        r.user = users[r.userId];
         return r;
     })
 }

@@ -627,7 +627,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     }
     else {
         if (!data.createdBy) data.createdBy = user.id;
-        if (!data.createdBy) data.createdOn = utcNow;
+        if (!data.createdOn) data.createdOn = utcNow;
         if (!data.ownedBy) data.ownedBy = user.id;
         if (!data.ownedOn) data.ownedOn = utcNow;
     }
