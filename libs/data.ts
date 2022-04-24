@@ -726,11 +726,13 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
             if (existingData.isGlobal != true && data.isGlobal == true) {
                 data.isGlobalOn = utcISOString();
                 data.isGlobalBy = user.id;
+                data.isGlobalOrderBy = data.isGlobalOn ? data.isGlobalOn : data.createdOn;
             }
 
             if (existingData.isGlobal == true && data.isGlobal != true) {
                 delete data.isGlobalOn;
                 delete data.isGlobalBy;
+                delete data.isGlobalOrderBy;
             }
 
             if (existingData.isPublished != true && data.isPublished == true) {
