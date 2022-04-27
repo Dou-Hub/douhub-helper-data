@@ -1585,10 +1585,10 @@ douhub-helper-util@1.0.82, douhub-helper-util@^1.0.82:
     slugify "^1.6.4"
     uuid "^8.3.2"
 
-douhub-helper-util@1.0.85:
-  version "1.0.85"
-  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.85.tgz#1074cb769e760b916a0b27dfb3763cc94207b9a0"
-  integrity sha512-DHMSgctz7uD6mqYNWaYq11yYspPqSRFW2J9T/UUZ2PZ8+Vgo4QsWipSxHkIIkA3ds3ktmGxlEi6iz3mlWoHCbg==
+douhub-helper-util@1.0.86:
+  version "1.0.86"
+  resolved "https://registry.yarnpkg.com/douhub-helper-util/-/douhub-helper-util-1.0.86.tgz#f3e19aed5d7456d021b5db23d70941e6579b0221"
+  integrity sha512-FkqWS4mWfowR7a4V+OSbJXvIP2lW0D654BVyiU6N+w2Ou3HsxjBDISZxoBVZk1KAntrhFxxA6Y4SUBmJyzb/IA==
   dependencies:
     axios "^0.24.0"
     csvtojson "^2.0.10"

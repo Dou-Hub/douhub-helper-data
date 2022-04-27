@@ -94,15 +94,19 @@ export const processQuery = (context: Record<string, any>, req?: Record<string, 
 export const groupConditions = (req: Record<string, any>): Record<string, any> => {
 
     for (var i = 0; i < req.conditions.length; i++) {
+        const condition = req.conditions[i];
         //conditions can be object or string
-        if (isObject(req.conditions[i])) {
+        if (isObject(condition)) {
             const paramName = `@p${newGuid().replace(/-/g, '')}`;
-            const paramValue = !isNil(req.conditions[i].value) ? req.conditions[i].value : '';
+            const paramValue = !isNil(condition.value) ? condition.value : '';
             req.parameters.push({ name: paramName, value: paramValue });
+            const membershipCondition = isNonEmptyString(req.recordIdForMembership) && condition.scope=='membership';
+            const attribute = isNonEmptyString(condition.attribute) ? 'c.' + condition.attribute : '';
+            const membershipAttributeName = membershipCondition && isNonEmptyString(condition.attribute) ? `c.membership["${req.recordIdForMembership}"].${condition.attribute}`: '';
 
-            const attribute = isNonEmptyString(req.conditions[i].attribute) ? 'c.' + req.conditions[i].attribute : '';
-            const op = isNonEmptyString(req.conditions[i].op) ? req.conditions[i].op.toUpperCase() : '';
+            const op = isNonEmptyString(condition.op) ? condition.op.toUpperCase() : '';
 
+            
             if (attribute.length > 0) {
                 switch (op) {
                     case 'SEARCH':
@@ -112,13 +116,12 @@ export const groupConditions = (req: Record<string, any>): Record<string, any> =
                         }
                     case 'ARRAY_CONTAINS':
                         {
-                            req.conditions[i] = `ARRAY_CONTAINS(${attribute}, ${paramName})`;
+                            req.conditions[i] = `ARRAY_CONTAINS(${membershipCondition?membershipAttributeName:attribute}, ${paramName})`;
                             break;
                         }
                     case 'NOT_ARRAY_CONTAINS':
                         {
-                            req.conditions[i] = `NOT ARRAY_CONTAINS(${attribute}, ${paramName})`;
-                            break;
+                            req.conditions[i] = `NOT ARRAY_CONTAINS(${membershipCondition?membershipAttributeName:attribute}, ${paramName})`;
                         }
                     case 'NOT_IN':
                     case 'IN':
@@ -128,7 +131,7 @@ export const groupConditions = (req: Record<string, any>): Record<string, any> =
 
                                 for (var i = 0; i < req.ids.length; i++) {
                                     if (i == 0) {
-                                        condition = `${attribute} ${op == 'NOT_IN' ? 'NOT IN' : 'IN'} (${paramName}${i}`;
+                                        condition = `${membershipCondition?membershipAttributeName:attribute} ${op == 'NOT_IN' ? 'NOT IN' : 'IN'} (${paramName}${i}`;
                                     }
                                     else {
                                         condition = `${condition} ,${paramName}${i}`;
@@ -143,27 +146,27 @@ export const groupConditions = (req: Record<string, any>): Record<string, any> =
                         }
                     case 'NOT_CONTAINS':
                         {
-                            req.conditions[i] = `NOT CONTAINS(${attribute}, ${paramName})`;
+                            req.conditions[i] = `NOT CONTAINS(${membershipCondition?membershipAttributeName:attribute}, ${paramName})`;
                             break;
                         }
                     case 'CONTAINS':
                         {
-                            req.conditions[i] = `CONTAINS(${attribute}, ${paramName})`;
+                            req.conditions[i] = `CONTAINS(${membershipCondition?membershipAttributeName:attribute}, ${paramName})`;
                             break;
                         }
                     case 'NOT_IS_DEFINED':
                         {
-                            req.conditions[i] = `NOT IS_DEFINED(${attribute})`;
+                            req.conditions[i] = `NOT IS_DEFINED(${membershipCondition?membershipAttributeName:attribute})`;
                             break;
                         }
                     case 'IS_DEFINED':
                         {
-                            req.conditions[i] = `IS_DEFINED(${attribute})`;
+                            req.conditions[i] = `IS_DEFINED(${membershipCondition?membershipAttributeName:attribute})`;
                             break;
                         }
                     default:
                         {
-                            req.conditions[i] = `${attribute} ${op} ${paramName}`;
+                            req.conditions[i] = `${membershipCondition?membershipAttributeName:attribute} ${op} ${paramName}`;
                             break;
                         }
                 }

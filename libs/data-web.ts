@@ -147,7 +147,7 @@ export const removeComments = (html: any): any => {
 export const fixImages = (html: any, settings: Record<string,any>): any => {
     let { protocol, host, removeImage } = settings;
     if (!isNonEmptyString(host)) return html;
-    protocol = isNonEmptyString(protocol) ? protocol : "https:";
+    protocol = isNonEmptyString(protocol) ? protocol : "https";
 
     if (removeImage) {
         html("img").remove();
@@ -157,10 +157,10 @@ export const fixImages = (html: any, settings: Record<string,any>): any => {
             if (isNonEmptyString(this.attribs.src)) {
                 const src = html(this).attr("src");
                 if (src.indexOf('//') == 0) {
-                    html(this).attr("src", `${protocol}${src}`);
+                    html(this).attr("src", `${protocol}:${src}`);
                 }
                 if (src.indexOf('/') == 0) {
-                    html(this).attr("src", `${protocol}//${host}${src}`);
+                    html(this).attr("src", `${protocol}://${host}${src}`);
                 }
             }
             else {
@@ -227,10 +227,10 @@ export const cleanElements = (html, settings: Record<string,any>) => {
                     else {
                         const href = html(this).attr("href");
                         if (href.indexOf('//') == 0) {
-                            html(this).attr("href", `${protocol}${href}`);
+                            html(this).attr("href", `${protocol}:${href}`);
                         }
                         if (href.indexOf('/') == 0) {
-                            html(this).attr("href", `${protocol}//${host}${href}`);
+                            html(this).attr("href", `${protocol}://${host}${href}`);
                         }
                     }
 
