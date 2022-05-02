@@ -893,6 +893,7 @@ export const generateSearchDisplay = (entity: Record<string, any>, data: Record<
     if (searchFields.length == 0) {
         searchFields = [
             { name: 'title', type: 'text' },
+            { name: 'subject', type: 'text' },
             { name: 'firstName', type: 'text' },
             { name: 'lastName', type: 'text' },
             { name: 'name', type: 'text' }
