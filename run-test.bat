@@ -1,1 +1,1 @@
-yarn jest
+call yarn jest
