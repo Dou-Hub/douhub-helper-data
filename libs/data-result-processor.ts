@@ -101,19 +101,20 @@ export const processAttributeValueText = (context:Record<string,any>, record:Rec
 export const processResultWithUserInfo = async (
     list: Array<Record<string, any>>, 
     attributeName?: string, 
-    onProcessItem?:(item:Record<string,any>)=>Record<string,any>) => {
+    onProcessItem?:(item:Record<string,any>)=>Record<string,any>): Promise<Record<string,any>[]> => 
+{
     let userIds = '';
-    let users = {};
+    const users = {};
     const propName = attributeName ? attributeName : 'ownedBy';
     let queryStatement = 'SELECT u.id,u.firstName,u.lastName,u.email,u.mobile,u.avatar FROM u WHERE u.entityName=@entityName AND u.id IN (';
-    let queryParams = [
+    const queryParams = [
         {
             name: '@entityName',
             value: 'User'
         }
     ];
     //Loop through the list and generate a new list format
-    const result = without(map(list, (item: Record<string, any>) => {
+    const result: Array<Record<string,any>|null> = without(map(list, (item: Record<string, any>) => {
         if (isFunction(onProcessItem)) item = onProcessItem(item);
         const userId = item[propName];
         if (!userId) return null;
