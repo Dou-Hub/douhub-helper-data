@@ -745,10 +745,10 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-17.0.6.tgz"
   integrity sha512-+XBAjfZmmivILUzO0HwBJoYkAyyySSLg5KCGBDFLomJo0sV6szvVLAf4ANZZ0pfWzgEds5KmGLG9D5hfEqOhaA==
 
-"@types/node@^16.11.6":
-  version "16.11.17"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.17.tgz#ae146499772e33fc6382e1880bc567e41a528586"
-  integrity sha512-C1vTZME8cFo8uxY2ui41xcynEotVkczIVI5AjLmy5pkpBv/FtG+jhtOlfcPysI8VRVwoOMv6NJm44LGnoMSWkw==
+"@types/node@^17.0.33":
+  version "17.0.35"
+  resolved "https://registry.npmjs.org/@types/node/-/node-17.0.35.tgz#635b7586086d51fb40de0a2ec9d1014a5283ba4a"
+  integrity sha512-vu1SrqBjbbZ3J6vwY17jBs8Sr/BKA+/a/WtjRG+whKg1iuLFOosq872EXS0eXWILdO36DHQQeku/ZcL6hz2fpg==
 
 "@types/prettier@^2.1.5":
   version "2.4.2"
@@ -1544,16 +1544,15 @@ domutils@^2.5.2, domutils@^2.7.0, domutils@^2.8.0:
     domelementtype "^2.2.0"
     domhandler "^4.2.0"
 
-douhub-helper-lambda@1.0.65:
-  version "1.0.65"
-  resolved "https://registry.npmjs.org/douhub-helper-lambda/-/douhub-helper-lambda-1.0.65.tgz#dcc31c143a92610e9f23aba34568bbb93d6314a6"
-  integrity sha512-wFlDD8tVCMMLkx9xsvya3znT645cw1mShNwzCtvleXDSjhx1z3dn50ysJOUEqCMU1pNnO0oB/+9RDVqi/hi2/g==
+douhub-helper-lambda@1.0.66:
+  version "1.0.66"
+  resolved "https://registry.npmjs.org/douhub-helper-lambda/-/douhub-helper-lambda-1.0.66.tgz#d5935990a03880150363bb7164364ba3e6826716"
+  integrity sha512-k/naaXMTBvDncmiYSnDlwGopv3YGzY8toqfRq7cgxLRH8xmO7SP31IHdN2b7xGwHxBM+yvvRVxD5DBvFgwBslQ==
   dependencies:
-    aws-sdk "^2.1033.0"
     axios "^0.24.0"
     crypto-js "^4.1.1"
     douhub-helper-service "1.0.59"
-    douhub-helper-util "^1.0.89"
+    douhub-helper-util "^1.0.91"
     lodash "^4.17.21"
     rate-limiter-flexible "^2.3.5"
     uuid "^8.3.2"
@@ -1585,10 +1584,10 @@ douhub-helper-util@1.0.82:
     slugify "^1.6.4"
     uuid "^8.3.2"
 
-douhub-helper-util@1.0.89, douhub-helper-util@^1.0.89:
-  version "1.0.89"
-  resolved "https://registry.npmjs.org/douhub-helper-util/-/douhub-helper-util-1.0.89.tgz#b37c3cffbc7a59a746d243b118f702e24338ff58"
-  integrity sha512-E7vkkT3iT9d4rNLjFhyva0Quu+rHJWeh3CAYRrpvdH9FyCtlC6fSB/tVMco0dI0AA8QjsuR9wTo9NAVKMG/uHg==
+douhub-helper-util@1.0.91, douhub-helper-util@^1.0.91:
+  version "1.0.91"
+  resolved "https://registry.npmjs.org/douhub-helper-util/-/douhub-helper-util-1.0.91.tgz#d4cab4570058bd22a3632dac2e9bf7816611b24a"
+  integrity sha512-n4b0sKZrt3REFN6+wZO4kSeMs1YqsNHVIaB9QfrCuDqu3o0gTUFWGh0g6sBfc4wwE3PpaLbOdA97dLGp8Pbk9w==
   dependencies:
     axios "^0.24.0"
     csvtojson "^2.0.10"
@@ -3996,10 +3995,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^4.5.2:
-  version "4.5.2"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-4.5.2.tgz"
-  integrity sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==
+typescript@^4.6.4:
+  version "4.6.4"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-4.6.4.tgz#caa78bbc3a59e6a5c510d35703f6a09877ce45e9"
+  integrity sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg==
 
 unbox-primitive@^1.0.1:
   version "1.0.1"
