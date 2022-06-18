@@ -1,7 +1,7 @@
 import {
     isObject, isNonEmptyString, getRecordFullName, getRecordMedia,
     getRecordDisplay, getRecordAbstract,
-    readableFileSize, numberWithCommas, getIntValueOfObject, getPropValueOfObject
+    readableFileSize, numberWithCommas
 } from 'douhub-helper-util';
 import { isArray, each, isBoolean, isNumber, find, repeat, isString, isUndefined, isNull, isFunction, isNil } from 'lodash';
 import { cleanHTML } from './data-web';
@@ -207,7 +207,7 @@ export const processContent = async (
     content = content.replace(new RegExp(`\\[${prefix}[.]KEY\\]`, "g"), isNonEmptyString(r.key) || isNumber(r.key) ? `${r.key}` : '');
 
 
-    for (var prop in r) {
+    for (const prop in r) {
 
         let v: any = r[prop];
         let arrayValues: string[] = [];
@@ -291,7 +291,8 @@ export const processContent = async (
                     v = v + repeat(' word', parseInt(`${4.5 * readtimeAdjust + 0.5}`));
                 }
 
-                let { duration, humanizedDuration } = readTime(v);
+                let { duration } = readTime(v);
+                const { humanizedDuration } = readTime(v);
 
                 if (duration < 0.6) {
                     duration = parseInt(`${(duration + 0.05) * 10}`) == 0 ? '' : parseInt(`${(duration + 0.05) * 10}`) * 10 + ' seconds';

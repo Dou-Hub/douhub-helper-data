@@ -8,7 +8,7 @@ import {
     isObject, newGuid, isNonEmptyString, _track, _process,
     getRecordDisplay, getRecordAbstract, applyRecordSlug,
     utcISOString, getEntity, getRecordFullName,
-    checkEntityPrivilege, checkRecordPrivilege, doNothing
+    checkEntityPrivilege, checkRecordPrivilege
 } from 'douhub-helper-util';
 import {
     HTTPERROR_403, HTTPERROR_400, sendAction, ERROR_PARAMETER_MISSING,
@@ -61,8 +61,8 @@ export const retrieveBase = async (context: Record<string, any>, ids: string[], 
     if (_track) console.log('retrieveBase', query);
 
 
-    //For retrieve, we will retrive the record first without security check
-    let result = await queryBase(context, query, true); //skipSecurityCheck=true
+    //For retrieve, we will retrieve the record first without security check
+    const result = await queryBase(context, query, true); //skipSecurityCheck=true
 
     if (_track) console.log('retrieveBase', result);
 
@@ -205,9 +205,9 @@ export const retrieveRelatedRecords = async (query: Record<string, any>, records
     const includeLookups = query.includeLookups;
     if (isArray(includeLookups) && includeLookups.length > 0) {
 
-        for (var i = 0; i < includeLookups.length; i++) {
+        for (let i = 0; i < includeLookups.length; i++) {
             if (isNonEmptyString(includeLookups[i].fieldName)) {
-                let lookupAttrs = isNonEmptyString(includeLookups[i].attributes) ? includeLookups[i].attributes : DEFAULT_LOOKUP_ATTRIBUTES;
+                const lookupAttrs = isNonEmptyString(includeLookups[i].attributes) ? includeLookups[i].attributes : DEFAULT_LOOKUP_ATTRIBUTES;
                 data = await retrieveRelatedRecordsBase(includeLookups[i].fieldName, lookupAttrs.split(','), `${includeLookups[i].fieldName}_info`, data);
             }
         }
@@ -219,7 +219,7 @@ export const retrieveRelatedRecords = async (query: Record<string, any>, records
 export const retrieveRelatedRecordsCache = (id: string): Record<string, any> => {
     const r = _process.relatedRecords[id];
     //-10*1000 make sure it is expired earlier so 
-    //retrieveRelatedRecordsCache in the retrieveRelatedRecordsBase will not get null in a sequencial calls 
+    //retrieveRelatedRecordsCache in the retrieveRelatedRecordsBase will not get null in a sequential calls 
     return r && r.ts > Date.now() - 10 * 1000 ? r.record : null;
 }
 
@@ -573,7 +573,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     delete data.uiHidden;
 
     //all xxx_info will not be allowed, because _info is system reserved for special query result
-    for (var prop in data) {
+    for (const prop in data) {
         if (endsWith(prop, '_info')) delete data[prop];
     }
 
@@ -665,7 +665,7 @@ export const processUpsertData = async (context: Record<string, any>, data: Reco
     data.slug = slug;
     data.slugs = slugs;
 
-    //tags need all trimed
+    //tags need all trimmed
     data.tags = isArray(data.tags) ? map(data.tags, (tag) => {
         if (isObject(tag)) {
             // tag.data = isArray(tag.data) ? map(tag.data, (d) => {
